@@ -1,0 +1,813 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FitLadder — Admin Métricas</title>
+
+<!-- Firebase SDK -->
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Barlow:ital,wght@0,400;0,600;0,700;0,900;1,400&display=swap" rel="stylesheet">
+
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg:    #080c14;
+  --bg2:   #0d1221;
+  --bg3:   #121829;
+  --bg4:   #1a2235;
+  --blue:  #2563eb;
+  --blue2: #3b82f6;
+  --blue3: #60a5fa;
+  --text:  #e8edf8;
+  --muted: #4a5568;
+  --border:#1e2a42;
+  --green: #10b981;
+  --red:   #f43f5e;
+  --yellow:#f59e0b;
+  --purple:#8b5cf6;
+  --cyan:  #06b6d4;
+  --fd:    'Bebas Neue', sans-serif;
+  --fb:    'Barlow', sans-serif;
+}
+
+html { font-size: 100%; }
+body {
+  font-family: var(--fb);
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+/* ── Background grain ── */
+body::before {
+  content: '';
+  position: fixed; inset: 0; z-index: 0; pointer-events: none;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+  background-size: 256px;
+}
+
+/* ── LOGIN SCREEN ── */
+#login-screen {
+  position: fixed; inset: 0; z-index: 100;
+  display: flex; align-items: center; justify-content: center;
+  background: var(--bg);
+}
+#login-screen.hidden { display: none; }
+
+.login-card {
+  background: var(--bg3);
+  border: 1px solid var(--border);
+  border-radius: 18px;
+  padding: 2.5rem 2rem;
+  width: min(380px, 92vw);
+  text-align: center;
+  box-shadow: 0 0 80px rgba(37,99,235,.12);
+}
+
+.login-logo {
+  font-family: var(--fd);
+  font-size: 38px;
+  letter-spacing: 2px;
+  color: var(--blue2);
+  margin-bottom: .15rem;
+}
+.login-sub {
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: .25em;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin-bottom: 2rem;
+}
+
+.login-inp {
+  width: 100%;
+  background: var(--bg4);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  color: var(--text);
+  font-family: var(--fb);
+  font-size: 16px;
+  padding: .7rem 1rem;
+  outline: none;
+  margin-bottom: .75rem;
+  transition: border-color .2s;
+}
+.login-inp:focus { border-color: var(--blue2); }
+
+.login-btn {
+  width: 100%;
+  background: var(--blue);
+  border: none;
+  border-radius: 10px;
+  color: #fff;
+  font-family: var(--fd);
+  font-size: 20px;
+  letter-spacing: 2px;
+  padding: .75rem;
+  cursor: pointer;
+  transition: background .2s, transform .1s;
+  margin-top: .25rem;
+}
+.login-btn:hover { background: var(--blue2); }
+.login-btn:active { transform: scale(.98); }
+
+.login-err {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--red);
+  min-height: 18px;
+  margin-top: .5rem;
+}
+
+/* ── MAIN LAYOUT ── */
+#main { position: relative; z-index: 1; }
+#main.hidden { display: none; }
+
+.top-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1rem 1.5rem;
+  border-bottom: 1px solid var(--border);
+  background: rgba(13,18,33,.85);
+  backdrop-filter: blur(10px);
+  position: sticky; top: 0; z-index: 50;
+}
+
+.top-logo {
+  font-family: var(--fd);
+  font-size: 26px;
+  letter-spacing: 2px;
+  color: var(--blue2);
+  display: flex;
+  align-items: center;
+  gap: .5rem;
+}
+.top-logo .badge {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: .18em;
+  background: rgba(37,99,235,.2);
+  border: 1px solid rgba(59,130,246,.4);
+  color: var(--blue3);
+  border-radius: 5px;
+  padding: .1rem .45rem;
+  font-family: var(--fb);
+  text-transform: uppercase;
+}
+
+.top-right {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+.top-user {
+  font-size: 13px;
+  color: var(--muted);
+  font-weight: 600;
+}
+.logout-btn {
+  background: transparent;
+  border: 1px solid var(--border);
+  border-radius: 7px;
+  color: var(--muted);
+  font-family: var(--fb);
+  font-size: 13px;
+  font-weight: 700;
+  padding: .3rem .75rem;
+  cursor: pointer;
+  transition: color .2s, border-color .2s;
+}
+.logout-btn:hover { color: var(--red); border-color: var(--red); }
+
+/* ── CONTENT ── */
+.content {
+  padding: 1.5rem 1.25rem 3rem;
+  max-width: 1100px;
+  margin: 0 auto;
+}
+
+/* ── KPI SUMMARY ROW ── */
+.kpi-row {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: .75rem;
+  margin-bottom: 2rem;
+}
+.kpi-card {
+  background: var(--bg3);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 1.1rem 1rem;
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+}
+.kpi-card::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 2px;
+  background: var(--accent, var(--blue));
+}
+.kpi-num {
+  font-family: var(--fd);
+  font-size: 40px;
+  letter-spacing: 1px;
+  color: var(--accent, var(--blue2));
+  line-height: 1;
+}
+.kpi-label {
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: .15em;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin-top: .3rem;
+}
+
+/* ── SECTION HEADER ── */
+.section-hdr {
+  display: flex;
+  align-items: baseline;
+  gap: .75rem;
+  margin-bottom: 1rem;
+  margin-top: 1.75rem;
+}
+.section-title {
+  font-family: var(--fd);
+  font-size: 24px;
+  letter-spacing: 1.5px;
+  color: var(--text);
+}
+.section-subtitle {
+  font-size: 13px;
+  color: var(--muted);
+}
+
+/* ── PANEL GRID ── */
+.panels-grid {
+  display: flex;
+  flex-direction: column;
+  gap: .6rem;
+}
+
+.panel-row {
+  background: var(--bg3);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: .85rem 1rem;
+  display: grid;
+  grid-template-columns: 36px 1fr auto auto;
+  align-items: center;
+  gap: .75rem;
+  transition: border-color .2s;
+  animation: fadeIn .4s ease both;
+}
+.panel-row:hover { border-color: rgba(59,130,246,.3); }
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(6px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.panel-rank {
+  font-family: var(--fd);
+  font-size: 20px;
+  color: var(--muted);
+  text-align: center;
+  width: 28px;
+}
+.panel-rank.gold   { color: #f59e0b; }
+.panel-rank.silver { color: #94a3b8; }
+.panel-rank.bronze { color: #cd7c4f; }
+
+.panel-info {}
+.panel-name {
+  font-family: var(--fd);
+  font-size: 19px;
+  letter-spacing: .5px;
+  line-height: 1.1;
+}
+.panel-key {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--muted);
+  letter-spacing: .1em;
+  text-transform: uppercase;
+}
+
+.panel-bar-wrap {
+  width: 180px;
+}
+.panel-bar-track {
+  height: 6px;
+  background: rgba(255,255,255,.06);
+  border-radius: 99px;
+  overflow: hidden;
+}
+.panel-bar-fill {
+  height: 100%;
+  border-radius: 99px;
+  background: var(--bar-color, var(--blue2));
+  transition: width 1s cubic-bezier(.22,1,.36,1);
+  width: 0%;
+}
+
+.panel-count {
+  font-family: var(--fd);
+  font-size: 26px;
+  letter-spacing: .5px;
+  color: var(--text);
+  text-align: right;
+  min-width: 52px;
+}
+.panel-pct {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--muted);
+  text-align: right;
+}
+
+/* ── REFRESH / LOADING ── */
+.refresh-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 1.25rem;
+}
+.refresh-btn {
+  display: flex;
+  align-items: center;
+  gap: .4rem;
+  background: transparent;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  color: var(--muted);
+  font-family: var(--fb);
+  font-size: 13px;
+  font-weight: 700;
+  padding: .35rem .8rem;
+  cursor: pointer;
+  transition: color .2s, border-color .2s;
+}
+.refresh-btn:hover { color: var(--blue3); border-color: var(--blue3); }
+.refresh-btn svg { transition: transform .5s; }
+.refresh-btn.spinning svg { transform: rotate(360deg); }
+
+.last-updated {
+  font-size: 12px;
+  color: var(--muted);
+  font-style: italic;
+}
+
+.loading-state {
+  text-align: center;
+  padding: 3rem 1rem;
+  font-family: var(--fd);
+  font-size: 22px;
+  letter-spacing: 2px;
+  color: var(--muted);
+}
+
+.error-state {
+  background: rgba(244,63,94,.08);
+  border: 1px solid rgba(244,63,94,.25);
+  border-radius: 12px;
+  padding: 1.5rem;
+  text-align: center;
+  color: var(--red);
+  font-weight: 700;
+}
+
+/* ── RESPONSIVE ── */
+@media(max-width:600px) {
+  .panel-bar-wrap { display: none; }
+  .panel-row { grid-template-columns: 28px 1fr auto; }
+  .kpi-num { font-size: 32px; }
+}
+
+/* ── ACCESS DENIED ── */
+#access-denied {
+  position: fixed; inset: 0; z-index: 200;
+  display: flex; align-items: center; justify-content: center;
+  background: var(--bg);
+}
+#access-denied.hidden { display: none; }
+.denied-card {
+  background: var(--bg3);
+  border: 1px solid rgba(244,63,94,.3);
+  border-radius: 18px;
+  padding: 2.5rem 2rem;
+  width: min(380px, 92vw);
+  text-align: center;
+}
+.denied-icon { font-size: 52px; margin-bottom: 1rem; }
+.denied-title { font-family: var(--fd); font-size: 30px; color: var(--red); margin-bottom: .5rem; }
+.denied-msg { color: var(--muted); font-size: 15px; line-height: 1.6; margin-bottom: 1.5rem; }
+.denied-btn {
+  background: var(--bg4);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  color: var(--text);
+  font-family: var(--fb);
+  font-size: 15px;
+  font-weight: 700;
+  padding: .65rem 1.5rem;
+  cursor: pointer;
+}
+</style>
+</head>
+<body>
+
+<!-- ════ LOGIN SCREEN ════ -->
+<div id="login-screen">
+  <div class="login-card">
+    <div class="login-logo">FIT LADDER</div>
+    <div class="login-sub">Admin · Métricas</div>
+    <input class="login-inp" id="inp-email" type="email" placeholder="Correo admin" autocomplete="username">
+    <input class="login-inp" id="inp-pass" type="password" placeholder="Contraseña" autocomplete="current-password"
+      onkeydown="if(event.key==='Enter') hacerLogin()">
+    <button class="login-btn" onclick="hacerLogin()">INGRESAR</button>
+    <div class="login-err" id="login-err"></div>
+  </div>
+</div>
+
+<!-- ════ ACCESS DENIED ════ -->
+<div id="access-denied" class="hidden">
+  <div class="denied-card">
+    <div class="denied-icon">🔒</div>
+    <div class="denied-title">ACCESO DENEGADO</div>
+    <div class="denied-msg">Esta sección es exclusiva del administrador del sistema.</div>
+    <button class="denied-btn" onclick="cerrarSesion()">CERRAR SESIÓN</button>
+  </div>
+</div>
+
+<!-- ════ MAIN ════ -->
+<div id="main" class="hidden">
+
+  <div class="top-bar">
+    <div class="top-logo">
+      <svg width="22" height="22" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">
+        <rect width="512" height="512" rx="96" fill="#2563eb"/>
+        <g fill="#fff">
+          <line x1="128" y1="380" x2="128" y2="120" stroke="#fff" stroke-width="16" stroke-linecap="round"/>
+          <line x1="224" y1="300" x2="224" y2="120" stroke="#fff" stroke-width="16" stroke-linecap="round"/>
+          <line x1="320" y1="220" x2="320" y2="120" stroke="#fff" stroke-width="16" stroke-linecap="round"/>
+          <rect x="120" y="380" width="80" height="32" rx="8"/>
+          <rect x="216" y="300" width="80" height="32" rx="8"/>
+          <rect x="312" y="220" width="80" height="32" rx="8"/>
+          <polyline points="128,260 224,200 320,140 392,100" fill="none" stroke="#fff" stroke-width="18" stroke-linecap="round" stroke-linejoin="round"/>
+          <circle cx="392" cy="100" r="18" fill="#fff"/>
+        </g>
+      </svg>
+      FIT LADDER
+      <span class="badge">Admin</span>
+    </div>
+    <div class="top-right">
+      <span class="top-user" id="top-user-email"></span>
+      <button class="logout-btn" onclick="cerrarSesion()">Cerrar sesión</button>
+    </div>
+  </div>
+
+  <div class="content">
+
+    <!-- KPI summary -->
+    <div class="kpi-row" id="kpi-row">
+      <div class="kpi-card" style="--accent:var(--blue2)">
+        <div class="kpi-num" id="kpi-total-users">—</div>
+        <div class="kpi-label">Usuarios Totales</div>
+      </div>
+      <div class="kpi-card" style="--accent:var(--green)">
+        <div class="kpi-num" id="kpi-active-users">—</div>
+        <div class="kpi-label">Con Datos Cargados</div>
+      </div>
+      <div class="kpi-card" style="--accent:var(--yellow)">
+        <div class="kpi-num" id="kpi-total-panels">—</div>
+        <div class="kpi-label">Total Usos de Paneles</div>
+      </div>
+      <div class="kpi-card" style="--accent:var(--purple)">
+        <div class="kpi-num" id="kpi-avg-panels">—</div>
+        <div class="kpi-label">Paneles Prom / Usuario</div>
+      </div>
+    </div>
+
+    <!-- Refresh bar -->
+    <div class="refresh-bar">
+      <div class="section-hdr" style="margin:0">
+        <div class="section-title">USO POR PANEL</div>
+        <div class="section-subtitle">Usuarios que han guardado datos</div>
+      </div>
+      <div style="display:flex;align-items:center;gap:1rem">
+        <span class="last-updated" id="last-updated"></span>
+        <button class="refresh-btn" id="refresh-btn" onclick="cargarMetricas()">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 12a9 9 0 0 1 15-6.7L21 8M21 12a9 9 0 0 1-15 6.7L3 16"/>
+            <polyline points="21 3 21 8 16 8"/>
+            <polyline points="3 21 3 16 8 16"/>
+          </svg>
+          ACTUALIZAR
+        </button>
+      </div>
+    </div>
+
+    <!-- Panels list -->
+    <div id="panels-container">
+      <div class="loading-state">⏳ CARGANDO MÉTRICAS…</div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+// ══════════════════════════════════════════════
+//  FIREBASE CONFIG
+// ══════════════════════════════════════════════
+const firebaseConfig = {
+  apiKey:            "AIzaSyBeLq0vGbUjbJX5rDl78hQ-dvaNCB0h3q0",
+  authDomain:        "fit-ladder-py.firebaseapp.com",
+  projectId:         "fit-ladder-py",
+  storageBucket:     "fit-ladder-py.firebasestorage.app",
+  messagingSenderId: "1089939861001",
+  appId:             "1:1089939861001:web:35b669d3cdc03bf090d2d8"
+};
+firebase.initializeApp(firebaseConfig);
+const auth = firebase.auth();
+const db   = firebase.firestore();
+
+// ══════════════════════════════════════════════
+//  ADMIN EMAIL WHITELIST
+// ══════════════════════════════════════════════
+const ADMIN_EMAIL = "sergueidt1@gmail.com";
+
+// ══════════════════════════════════════════════
+//  PANEL DEFINITIONS
+//  key: Firestore field in users doc (or logic check)
+//  label: display name
+//  icon: emoji
+//  color: bar accent color
+//  detect: function(userData) -> bool   (returns true if user has data for this panel)
+// ══════════════════════════════════════════════
+const PANELS = [
+  {
+    id: "resultados",
+    label: "Resultados (PRs)",
+    icon: "🏆",
+    color: "#3b82f6",
+    detect: d => d.pr && Object.values(d.pr).some(v => typeof v === 'number' && v > 0),
+  },
+  {
+    id: "pesocorporal",
+    label: "Peso Corporal",
+    icon: "⚖️",
+    color: "#10b981",
+    detect: d => d.hist && Array.isArray(d.hist) && d.hist.length > 0,
+  },
+  {
+    id: "antropometricos",
+    label: "Antropométrico",
+    icon: "📐",
+    color: "#8b5cf6",
+    detect: d => (d.antroMedidas && Object.keys(d.antroMedidas).length > 0)
+               || (d.antroRMs    && Object.keys(d.antroRMs).length    > 0),
+  },
+  {
+    id: "calorias",
+    label: "Calorías",
+    icon: "🔥",
+    color: "#f59e0b",
+    detect: d => d.calObjetivo != null || (d.calDiario && Object.keys(d.calDiario).length > 0),
+  },
+  {
+    id: "competencias",
+    label: "Competencias",
+    icon: "🥇",
+    color: "#f43f5e",
+    detect: d => Array.isArray(d.competencias) && d.competencias.length > 0,
+  },
+  {
+    id: "relacion",
+    label: "Relación (Snatch)",
+    icon: "📊",
+    color: "#06b6d4",
+    detect: d => d.hist && Array.isArray(d.hist) && d.hist.some(h => h.snatchBase != null),
+  },
+  {
+    id: "cmenstrual",
+    label: "Ciclo Menstrual",
+    icon: "🌙",
+    color: "#ec4899",
+    detect: d => d.cicloMenstrual != null && Object.keys(d.cicloMenstrual).length > 0,
+  },
+  {
+    id: "benchmark",
+    label: "Benchmark",
+    icon: "⏱️",
+    color: "#a78bfa",
+    // Uses separate collection fl_benchmark_ranking — counted via distinct uid
+    detect: d => d._hasBenchmark === true,
+  },
+];
+
+// ══════════════════════════════════════════════
+//  AUTH STATE
+//  Firebase Auth persiste automáticamente en localStorage.
+//  Si el admin ya inició sesión en index.html (mismo dominio/origen),
+//  este archivo lo detecta sin necesidad de re-login.
+//  El sessionStorage fl_admin_email es solo una señal de referencia.
+// ══════════════════════════════════════════════
+auth.onAuthStateChanged(async user => {
+  if (!user) {
+    // Verificar si viene de index.html con email de admin guardado
+    const fromAdmin = sessionStorage.getItem('fl_admin_email') === ADMIN_EMAIL;
+    if (fromAdmin) {
+      // Esperar un tick más por si Firebase tarda en rehidratar la sesión
+      setTimeout(() => {
+        if (!auth.currentUser) showScreen('login');
+      }, 1500);
+    } else {
+      showScreen('login');
+    }
+    return;
+  }
+  if (user.email !== ADMIN_EMAIL) {
+    showScreen('access-denied');
+    return;
+  }
+  sessionStorage.removeItem('fl_admin_email');
+  document.getElementById('top-user-email').textContent = user.email;
+  showScreen('main');
+  await cargarMetricas();
+});
+
+function showScreen(s) {
+  document.getElementById('login-screen').classList.toggle('hidden', s !== 'login');
+  document.getElementById('access-denied').classList.toggle('hidden', s !== 'access-denied');
+  document.getElementById('main').classList.toggle('hidden', s !== 'main');
+}
+
+// ══════════════════════════════════════════════
+//  LOGIN
+// ══════════════════════════════════════════════
+async function hacerLogin() {
+  const email = document.getElementById('inp-email').value.trim();
+  const pass  = document.getElementById('inp-pass').value;
+  const err   = document.getElementById('login-err');
+  err.textContent = '';
+  if (!email || !pass) { err.textContent = 'Completá todos los campos.'; return; }
+  try {
+    await auth.signInWithEmailAndPassword(email, pass);
+  } catch(e) {
+    err.textContent = e.code === 'auth/wrong-password' || e.code === 'auth/user-not-found'
+      ? 'Credenciales incorrectas.' : 'Error: ' + e.message;
+  }
+}
+
+function cerrarSesion() {
+  auth.signOut();
+}
+
+// ══════════════════════════════════════════════
+//  LOAD METRICS
+// ══════════════════════════════════════════════
+let _loading = false;
+
+async function cargarMetricas() {
+  if (_loading) return;
+  _loading = true;
+
+  const btn = document.getElementById('refresh-btn');
+  btn.classList.add('spinning');
+
+  const container = document.getElementById('panels-container');
+  container.innerHTML = '<div class="loading-state">⏳ ANALIZANDO USUARIOS…</div>';
+
+  try {
+    // 1. Fetch all users
+    const usersSnap = await db.collection('users').get();
+    const totalUsers = usersSnap.size;
+
+    // 2. Fetch benchmark UIDs
+    const benchSnap = await db.collection('fl_benchmark_ranking').get();
+    const benchUids = new Set();
+    benchSnap.forEach(d => { if (d.data().uid) benchUids.add(d.data().uid); });
+
+    // 3. Build user data map with benchmark flag
+    const allUsers = [];
+    usersSnap.forEach(doc => {
+      const d = { ...doc.data(), _uid: doc.id };
+      if (benchUids.has(doc.id)) d._hasBenchmark = true;
+      allUsers.push(d);
+    });
+
+    // 4. Count per panel
+    const counts = {};
+    let totalPanelUses = 0;
+    let activeUsers = 0;
+
+    PANELS.forEach(p => { counts[p.id] = 0; });
+
+    allUsers.forEach(ud => {
+      let hasAny = false;
+      PANELS.forEach(p => {
+        try {
+          if (p.detect(ud)) { counts[p.id]++; totalPanelUses++; hasAny = true; }
+        } catch(_) {}
+      });
+      if (hasAny) activeUsers++;
+    });
+
+    // 5. Sort by count desc
+    const sorted = [...PANELS].sort((a, b) => counts[b.id] - counts[a.id]);
+    const maxCount = counts[sorted[0]?.id] || 1;
+
+    // 6. Update KPIs
+    animateNum('kpi-total-users',  totalUsers);
+    animateNum('kpi-active-users', activeUsers);
+    animateNum('kpi-total-panels', totalPanelUses);
+    const avg = totalUsers > 0 ? (totalPanelUses / totalUsers).toFixed(1) : '0';
+    document.getElementById('kpi-avg-panels').textContent = avg;
+
+    // 7. Render panel rows
+    const rankColors = ['gold', 'silver', 'bronze'];
+    container.innerHTML = '<div class="panels-grid" id="panels-grid"></div>';
+    const grid = document.getElementById('panels-grid');
+
+    sorted.forEach((p, i) => {
+      const cnt = counts[p.id];
+      const pct = totalUsers > 0 ? ((cnt / totalUsers) * 100).toFixed(1) : 0;
+      const barW = totalUsers > 0 ? ((cnt / totalUsers) * 100).toFixed(2) : 0;
+
+      const row = document.createElement('div');
+      row.className = 'panel-row';
+      row.style.animationDelay = (i * 0.05) + 's';
+      row.innerHTML = `
+        <div class="panel-rank ${rankColors[i] || ''}">${i + 1}</div>
+        <div class="panel-info">
+          <div class="panel-name">${p.icon} ${p.label}</div>
+          <div class="panel-key">${p.id}</div>
+        </div>
+        <div class="panel-bar-wrap">
+          <div class="panel-bar-track">
+            <div class="panel-bar-fill" id="bar-${p.id}" style="--bar-color:${p.color};width:0%"></div>
+          </div>
+          <div style="display:flex;justify-content:space-between;margin-top:.3rem">
+            <span style="font-size:11px;color:var(--muted)">${pct}% de usuarios</span>
+          </div>
+        </div>
+        <div>
+          <div class="panel-count">${cnt}</div>
+          <div class="panel-pct">${pct}%</div>
+        </div>
+      `;
+      grid.appendChild(row);
+
+      // Animate bar
+      requestAnimationFrame(() => {
+        setTimeout(() => {
+          const bar = document.getElementById('bar-' + p.id);
+          if (bar) bar.style.width = barW + '%';
+        }, 100 + i * 60);
+      });
+    });
+
+    // 8. Timestamp
+    document.getElementById('last-updated').textContent =
+      'Actualizado: ' + new Date().toLocaleTimeString('es-AR', { hour: '2-digit', minute: '2-digit' });
+
+  } catch(e) {
+    console.error(e);
+    document.getElementById('panels-container').innerHTML =
+      `<div class="error-state">⚠️ Error al cargar datos: ${e.message}<br><br>
+       <span style="font-weight:400;font-size:13px;">Verificá las reglas de seguridad de Firestore para que el admin pueda leer la colección users.</span></div>`;
+  } finally {
+    _loading = false;
+    btn.classList.remove('spinning');
+  }
+}
+
+// ── Animated number counter ──
+function animateNum(id, target) {
+  const el = document.getElementById(id);
+  if (!el) return;
+  const start = 0;
+  const dur   = 800;
+  const t0    = performance.now();
+  function step(now) {
+    const p = Math.min((now - t0) / dur, 1);
+    const ease = 1 - Math.pow(1 - p, 3);
+    el.textContent = Math.round(start + (target - start) * ease);
+    if (p < 1) requestAnimationFrame(step);
+  }
+  requestAnimationFrame(step);
+}
+</script>
+</body>
+</html>
