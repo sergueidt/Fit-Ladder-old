@@ -8310,11 +8310,36 @@ function getInitials(name) {
 // ══════════════════════════════════════════════
 const SK_MW_CODE_TRIED = "fl_mw_tried_v1"; // "1" si ya intentó vincular y no es MRB
 
-// Nombres válidos para Met Revolution BOX (insensible a mayúsculas/tildes)
-function _esMetRevolution(nombre) {
-  const n = nombre.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g,"").trim();
-  return /met\s*revolution|met\s*rev|mrb|met\s*workout/.test(n);
-}
+// ══════════════════════════════════════════════
+//  BOXES VINCULADOS AL SISTEMA FIT LADDER
+// ══════════════════════════════════════════════
+const BOXES_REGISTRADOS = [
+  {
+    id: "met_revolution",
+    nombre: "Met Revolution BOX",
+    aliases: /met\s*revolution|met\s*rev|mrb|met\s*workout/
+  },
+  {
+    id: "expandable_box",
+    nombre: "Expandable BOX",
+    aliases: /expandable\s*box|expandable\b/
+  },
+  {
+    id: "sama_training",
+    nombre: "Sama Training",
+    aliases: /sama\s*training|sama\b/
+  },
+  {
+    id: "action_fitness",
+    nombre: "Action Fitness",
+    aliases: /action\s*fitness|action\b/
+  }
+];
+
+function detectarBox(nombreIngresado) {
+  const n = nombreIngresado.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g,"").trim();
+  return BOXES_REGISTRADOS.find(b => b.aliases.test(n)) || null;
+  }
 
 // ── Flujo 1: viene desde Met Workout con código en portapapeles ──
 // Se llama al entrar a la app si no está vinculado aún
@@ -8513,8 +8538,10 @@ function verificarNombreBox() {
     return;
   }
 
-  if (_esMetRevolution(nombre)) {
+  const box = detectarBox(nombre);
+  if (box) {
     // ✅ Reconocido — mostrar paso 2
+    window._boxDetectado = box;
     document.getElementById("fl-mv-paso1").style.display = "none";
     document.getElementById("fl-mv-paso2").style.display = "block";
     setTimeout(() => document.getElementById("fl-mv-code-inp")?.focus(), 100);
@@ -8541,7 +8568,8 @@ async function confirmarVincularManual() {
   await pushRMsAMetWorkout(pr);
 
   cerrarModalVincularManual();
-  showToast(`✅ VINCULADO CON MET REVOLUTION BOX — CÓDIGO ${code}`);
+  const nombreBox = (window._boxDetectado?.nombre || "BOX").toUpperCase();
+  showToast(`✅ VINCULADO CON ${nombreBox} — CÓDIGO ${code}`);
   actualizarMenuMW();
 }
 
