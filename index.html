@@ -23,8 +23,6 @@
 <script src="https://appleid.cdn-apple.com/appleauth/static/jsapi/appleid/1/en_US/appleid.auth.js" async defer></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
-<!-- EmailJS para notificaciones admin -->
-<script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
 
 <script>
 const FL_SVG = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
@@ -2639,46 +2637,6 @@ body::after {
   display: flex; align-items: center; transition: all .2s;
 }
 .prof-del-btn:hover { border-color: var(--red); color: var(--red); background: rgba(244,63,94,.08); }
-.prof-modal-overlay {
-  position: fixed; inset: 0; background: rgba(0,0,0,.88);
-  backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
-  z-index: 3500; display: flex; align-items: center; justify-content: center;
-  padding: 1.5rem; animation: fadeIn .2s ease both;
-}
-.prof-modal-overlay.hidden { display: none; }
-.prof-modal-card {
-  background: var(--bg2); border: 1px solid rgba(124,58,237,.4); border-radius: 18px;
-  padding: 1.6rem 1.4rem; width: 100%; max-width: 380px;
-  display: flex; flex-direction: column; gap: 1rem;
-  box-shadow: 0 0 50px rgba(124,58,237,.2), 0 8px 40px rgba(0,0,0,.5);
-  animation: popIn .3s cubic-bezier(.2,.8,.4,1.2) both;
-}
-.prof-modal-title { font-family: var(--fd); font-size: 28px; letter-spacing: 1.5px; color: var(--text); display: flex; align-items: center; gap: .6rem; }
-.prof-modal-desc  { font-family: var(--fb); font-size: 19px; color: var(--muted); line-height: 1.6; }
-.prof-modal-lbl   { font-family: var(--fb); font-size: 16px; font-weight: 700; letter-spacing: .15em; text-transform: uppercase; color: var(--muted); margin-bottom: .3rem; }
-.prof-modal-inp {
-  background: var(--bg3); border: 1px solid var(--border); color: var(--text);
-  font-family: var(--fb); font-size: 21px; font-weight: 700;
-  padding: .75rem 1rem; border-radius: 9px; width: 100%; outline: none; transition: border-color .2s;
-}
-.prof-modal-inp:focus { border-color: #7c3aed; }
-.prof-modal-inp::placeholder { color: var(--muted); font-weight: 400; }
-.prof-modal-err { font-family: var(--fb); font-size: 17px; font-weight: 700; color: var(--red); display: none; margin-top: -.3rem; }
-.btn-create-prof {
-  background: linear-gradient(135deg,#7c3aed,#4f46e5); color: #fff; border: none; border-radius: 10px;
-  padding: .9rem; font-family: var(--fb); font-size: 21px; font-weight: 900;
-  letter-spacing: .08em; text-transform: uppercase; cursor: pointer; width: 100%;
-  display: flex; align-items: center; justify-content: center; gap: .5rem;
-  box-shadow: 0 4px 20px rgba(124,58,237,.4); transition: all .2s;
-}
-.btn-create-prof:disabled { opacity: .5; cursor: not-allowed; }
-.btn-add-prof {
-  display: flex; align-items: center; gap: .4rem;
-  background: rgba(124,58,237,.1); border: 1px solid rgba(124,58,237,.4); color: #a78bfa;
-  border-radius: 8px; padding: .45rem .8rem; font-family: var(--fb); font-size: 16px;
-  font-weight: 700; letter-spacing: .07em; text-transform: uppercase; cursor: pointer; transition: all .2s;
-}
-.btn-add-prof:hover { background: rgba(124,58,237,.2); border-color: #7c3aed; }
 .prof-auth-section {
   background: rgba(124,58,237,.08); border: 1px solid rgba(124,58,237,.3);
   border-radius: 12px; padding: 1rem 1.1rem; display: flex; flex-direction: column; gap: .65rem;
@@ -2701,7 +2659,7 @@ body::after {
 <div class="toast" id="toast"></div>
 
 <!-- ════ PANTALLA AUTH ════ -->
-<div id="s-auth" style="display:flex;">
+<div id="s-auth" style="display:none;">
   <div class="auth-logo">
     <div class="auth-icon">
       <svg viewBox="0 0 42 42" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -2868,8 +2826,6 @@ body::after {
 
     <div id="auth-error-box" class="auth-error-box" style="display:none;"></div>
 
-    <button class="auth-link-btn" onclick="toggleProfSection()" style="color:#a78bfa;margin-top:.1rem">🎓 Soy profesor registrado</button>
-
     <!-- Sección Profesor Registrado -->
     <div class="prof-auth-section" id="prof-auth-section" style="display:none;">
       <div class="prof-auth-title">
@@ -2877,9 +2833,7 @@ body::after {
         Profesor registrado
       </div>
       <div class="prof-auth-desc">Si el administrador ya creó tu perfil, ingresá tu nombre exactamente como fue registrado para activar tu cuenta.</div>
-      <div class="prof-modal-lbl" style="margin-bottom:.2rem">Tu nombre (tal como lo registró el admin)</div>
-      <input class="prof-modal-inp" id="prof-reg-nombre" type="text" placeholder="Ej: Juan Pérez" autocomplete="name" oninput="this.value=this.value" style="font-size:19px;padding:.65rem .9rem">
-      <div id="prof-auth-err" style="font-family:var(--fb);font-size:17px;font-weight:700;color:var(--red);display:none;"></div>
+      <div class="prof-modal-lbl" style="margin-bottom:.2rem">Tu nombre (tal como lo registró el admin)</div>      <div id="prof-auth-err" style="font-family:var(--fb);font-size:17px;font-weight:700;color:var(--red);display:none;"></div>
       <button class="btn-prof-register" onclick="abrirRegistroProfesor()">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/><line x1="19" y1="8" x2="19" y2="14"/><line x1="22" y1="11" x2="16" y2="11"/></svg>
         CONTINUAR COMO PROFESOR
@@ -3112,14 +3066,6 @@ body::after {
       <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
       Feed
     </button>
-    <button class="drawer-item" id="tab-profesores" onclick="drawerTab('profesores')">
-      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
-      Profesores
-    </button>
-    <button class="drawer-item drawer-item-hidden" id="tab-misalumnos" onclick="drawerTab('misalumnos')">
-      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 10v6M2 10l10-5 10 5-10 5z"/><path d="M6 12v5c3 3 9 3 12 0v-5"/></svg>
-      Mis Alumnos
-    </button>
 
     <!-- Info -->
     <div class="drawer-nav-section">Info</div>
@@ -3192,11 +3138,6 @@ body::after {
             <input class="date-inp" id="pr-cleanjerk-fecha" type="date" style="font-size:18px;padding:.35rem .55rem;">
           </div>
         </div>
-
-
-
-
-
 
 
         <div class="field-row" style="flex-direction:column;align-items:stretch;gap:.55rem;border-top:1px solid var(--border);">
@@ -3319,7 +3260,6 @@ body::after {
       </div>
 
       <div id="nota-mejorar" style="display:none;"><ul id="lista-mejorar"></ul></div>
-
 
 
       <!-- ── RMs TEÓRICOS VS REALES — solo entrenador/admin ── -->
@@ -4471,123 +4411,6 @@ body::after {
 
 
     <!-- ── PANEL FEED ── -->
-    <!-- ── PANEL MI PROFESOR ── -->
-    <!-- ══ PANEL PROFESORES (alumno) ══ -->
-    <div class="tab-panel" id="panel-profesores">
-
-      <!-- ── SECCIÓN 1: Mi conexión actual (siempre visible si hay vínculo o solicitud) ── -->
-      <div id="prof-conexion-blk" style="display:none;">
-        <div class="graf-block">
-          <div class="graf-block-hdr">🔗 Mi conexión</div>
-          <div class="graf-block-body" id="prof-conexion-wrap">
-            <div class="admin-loading"><div class="auth-spinner"></div>CARGANDO…</div>
-          </div>
-        </div>
-        <!-- Permisos (solo si vinculado) -->
-        <div class="graf-block" id="prof-permisos-blk" style="display:none;">
-          <div class="graf-block-hdr">🔒 Qué puede ver tu profesor</div>
-          <div class="graf-block-body" style="gap:.6rem;">
-            <div style="font-size:15px;color:var(--blue3);background:rgba(37,99,235,.08);border:1px solid rgba(37,99,235,.2);border-radius:10px;padding:.65rem .85rem;line-height:1.5;">
-              🛡️ Vos controlás qué ve tu profesor. Podés cambiar los permisos en cualquier momento.
-            </div>
-            <div id="prof-permisos-list" style="display:flex;flex-direction:column;gap:.5rem;"></div>
-            <button onclick="guardarPermisos()" style="background:var(--blue);border:none;border-radius:10px;padding:.65rem;color:#fff;font-family:var(--fb);font-size:15px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;cursor:pointer;width:100%;">
-              💾 GUARDAR PERMISOS
-            </button>
-          </div>
-        </div>
-      </div>
-
-      <!-- ── SECCIÓN 2: Lista de profesores activos (siempre visible) ── -->
-      <div class="graf-block">
-        <div class="graf-block-hdr">🏫 Profesores</div>
-        <div class="graf-block-body" id="prof-lista" style="gap:.8rem;">
-          <div class="admin-loading"><div class="auth-spinner"></div>CARGANDO…</div>
-        </div>
-      </div>
-
-      <!-- ── SECCIÓN 3: Solicitud para ser profesor ── -->
-      <div id="staff-solicitud-blk" class="graf-block">
-        <div class="graf-block-hdr">🎓 ¿Querés ser parte del staff?</div>
-        <div class="graf-block-body" id="staff-solicitud-body" style="gap:.6rem;">
-          <div style="font-size:15px;color:var(--muted);line-height:1.6;">
-            Entrenadores, nutricionistas, profesores de educación física y otros profesionales pueden unirse al staff de Fit Ladder.<br>
-            <strong style="color:var(--text);">Completá tu perfil y enviá tu solicitud. Te notificaremos por correo.</strong>
-          </div>
-          <input id="staff-nombre-inp"    class="modal-inp" type="text"  placeholder="Nombre completo *" maxlength="60">
-          <select id="staff-esp-inp" class="modal-inp" style="appearance:none;-webkit-appearance:none;padding-right:2rem;cursor:pointer;">
-            <option value="">Especialidad *</option>
-            <option value="Entrenador personal">🏋️ Entrenador personal</option>
-            <option value="Profesor de educación física">🤸 Profesor de educación física</option>
-            <option value="Nutricionista">🥗 Nutricionista</option>
-            <option value="CrossFit / Halterofilia">💪 CrossFit / Halterofilia</option>
-            <option value="Yoga / Pilates">🧘 Yoga / Pilates</option>
-            <option value="Otro">💬 Otro</option>
-          </select>
-          <input id="staff-esp-otro-inp" class="modal-inp" type="text" placeholder="Especificá tu especialidad" maxlength="80" style="display:none;">
-          <textarea id="staff-bio-inp" class="modal-inp" placeholder="Descripción / bio — contanos tu experiencia y qué ofrecés *" maxlength="600" style="min-height:90px;resize:none;"></textarea>
-          <input id="staff-ig-inp" class="modal-inp" type="text" placeholder="Instagram (opcional, sin @)" maxlength="50">
-          <div id="staff-msg" style="font-size:14px;text-align:center;min-height:16px;"></div>
-          <button onclick="enviarSolicitudStaff()" style="display:flex;align-items:center;justify-content:center;gap:.5rem;background:linear-gradient(135deg,#7c3aed,#2563eb);border:none;border-radius:11px;padding:.75rem 1rem;color:#fff;font-family:var(--fb);font-size:15px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;cursor:pointer;width:100%;box-shadow:0 4px 20px rgba(124,58,237,.3);" id="staff-submit-btn">
-            📤 ENVIAR SOLICITUD
-          </button>
-        </div>
-      </div>
-
-    </div>
-
-    <!-- ══ PANEL MIS ALUMNOS (profesor) ══ -->
-    <div class="tab-panel" id="panel-misalumnos">
-
-      <!-- Perfil del profesor -->
-      <div class="graf-block">
-        <div class="graf-block-hdr" style="justify-content:space-between;">
-          <span>👤 Mi Perfil de Profesor</span>
-          <button onclick="toggleEditarPerfil()" id="btn-editar-perfil" style="background:rgba(37,99,235,.15);border:1px solid rgba(37,99,235,.3);border-radius:7px;color:var(--blue3);font-family:var(--fb);font-size:12px;font-weight:700;letter-spacing:.07em;padding:.25rem .6rem;cursor:pointer;text-transform:uppercase;">✏️ Editar</button>
-        </div>
-        <div class="graf-block-body" id="perfil-prof-view" style="gap:.5rem;"></div>
-        <div id="perfil-prof-edit" style="display:none;padding:.75rem 1rem;display:none;flex-direction:column;gap:.6rem;">
-          <input id="perfil-nombre-inp"      class="modal-inp" type="text"      placeholder="Nombre completo" maxlength="60">
-          <textarea id="perfil-bio-inp"      class="modal-inp" placeholder="Descripción / bio (requerida para aparecer en la lista)" maxlength="400" style="min-height:80px;resize:none;"></textarea>
-          <select id="perfil-especialidad-inp" class="modal-inp" style="appearance:none;-webkit-appearance:none;background-image:url('data:image/svg+xml,<svg xmlns=\'http://www.w3.org/2000/svg\' viewBox=\'0 0 24 24\' fill=\'none\' stroke=\'%234a5568\' stroke-width=\'2\'><polyline points=\'6 9 12 15 18 9\'/></svg>');background-repeat:no-repeat;background-position:right .75rem center;background-size:16px;padding-right:2.2rem;cursor:pointer;">
-            <option value="">Seleccioná tu especialidad…</option>
-            <option value="Entrenador personal">🏋️ Entrenador personal</option>
-            <option value="Profesor de educación física">🤸 Profesor de educación física</option>
-            <option value="Nutricionista">🥗 Nutricionista</option>
-            <option value="CrossFit / Halterofilia">💪 CrossFit / Halterofilia</option>
-            <option value="Yoga / Pilates">🧘 Yoga / Pilates</option>
-            <option value="Otro">💬 Otro</option>
-          </select>
-          <input id="perfil-especialidad-otro" class="modal-inp" type="text" placeholder="Especificá tu especialidad" maxlength="80" style="display:none;">
-          <input id="perfil-ig-inp"           class="modal-inp" type="text"     placeholder="Instagram (opcional, sin @)" maxlength="50">
-          <button onclick="guardarPerfilProfesor()" style="background:var(--green);border:none;border-radius:10px;padding:.65rem;color:#fff;font-family:var(--fb);font-size:15px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;cursor:pointer;width:100%;">
-            💾 GUARDAR PERFIL
-          </button>
-          <div id="perfil-save-msg" style="font-size:14px;text-align:center;min-height:18px;"></div>
-        </div>
-      </div>
-
-      <!-- Solicitudes pendientes -->
-      <div class="graf-block" id="mis-sol-blk" style="display:none;">
-        <div class="graf-block-hdr" style="color:var(--yellow);">🔔 Solicitudes pendientes</div>
-        <div class="graf-block-body" id="mis-sol-list" style="gap:.5rem;"></div>
-      </div>
-
-      <!-- Alumnos vinculados -->
-      <div class="graf-block">
-        <div class="graf-block-hdr">🎓 Mis Alumnos vinculados</div>
-        <div class="graf-block-body" id="mis-alumnos-list" style="gap:.5rem;">
-          <div class="admin-loading"><div class="auth-spinner"></div>CARGANDO…</div>
-        </div>
-      </div>
-
-    </div>
-
-    <div class="tab-panel" id="panel-feed">
-      <div id="feed-contenido" style="display:flex;flex-direction:column;gap:.75rem"></div>
-    </div>
-
-    <!-- ════ PANEL TÉRMINOS Y CONDICIONES ════ -->
     <div class="tab-panel" id="panel-terminos">
       <div style="display:flex;flex-direction:column;gap:1.1rem;padding:.2rem 0 2rem;">
 
@@ -4631,7 +4454,7 @@ body::after {
         <!-- Sección: Limitación de responsabilidad -->
         <div style="background:var(--bg2);border:1px solid var(--border);border-radius:14px;padding:1rem 1.1rem;">
           <div style="font-family:var(--fd);font-size:19px;letter-spacing:1px;color:var(--blue3);margin-bottom:.5rem;">6. Limitación de responsabilidad</div>
-          <p style="font-family:var(--fb);font-size:15px;color:var(--muted);line-height:1.7;">Fit Ladder no se responsabiliza por lesiones, daños físicos o consecuencias derivadas de seguir rutinas, pesos o datos mostrados en la plataforma. Consultá siempre a un profesional de la salud o entrenador certificado antes de realizar cambios en tu entrenamiento.</p>
+          <p style="font-family:var(--fb);font-size:15px;color:var(--muted);line-height:1.7;">Fit Ladder no se responsabiliza por lesiones, daños físicos o consecuencias derivadas de seguir rutinas, pesos o datos mostrados en la plataforma. Consultá siempre a un profesional de la salud antes de realizar cambios en tu entrenamiento.</p>
         </div>
 
         <!-- Sección: Modificaciones -->
@@ -4654,12 +4477,12 @@ body::after {
 
         <div style="background:var(--bg2);border:1px solid var(--border);border-radius:14px;padding:1rem 1.1rem;">
           <div style="font-family:var(--fd);font-size:19px;letter-spacing:1px;color:var(--green);margin-bottom:.5rem;">¿Para qué los usamos?</div>
-          <p style="font-family:var(--fb);font-size:15px;color:var(--muted);line-height:1.7;">Exclusivamente para brindarte las funcionalidades de Fit Ladder: guardar tu progreso, mostrarte gráficos de evolución y conectarte con tu profesor si lo solicitás. No usamos tus datos con fines publicitarios.</p>
+          <p style="font-family:var(--fb);font-size:15px;color:var(--muted);line-height:1.7;">Exclusivamente para brindarte las funcionalidades de Fit Ladder: guardar tu progreso, mostrarte gráficos de evolución y No usamos tus datos con fines publicitarios.</p>
         </div>
 
         <div style="background:var(--bg2);border:1px solid var(--border);border-radius:14px;padding:1rem 1.1rem;">
           <div style="font-family:var(--fd);font-size:19px;letter-spacing:1px;color:var(--green);margin-bottom:.5rem;">¿Compartimos tus datos?</div>
-          <p style="font-family:var(--fb);font-size:15px;color:var(--muted);line-height:1.7;">No vendemos ni cedemos tus datos a terceros. Solo los compartimos con tu profesor si vos lo solicitás explícitamente a través de la función de vinculación. El profesor solo puede ver lo que vos habilitás en los permisos.</p>
+          <p style="font-family:var(--fb);font-size:15px;color:var(--muted);line-height:1.7;">No vendemos ni cedemos tus datos a terceros. No compartimos tus datos con terceros.</p>
         </div>
 
         <div style="background:var(--bg2);border:1px solid var(--border);border-radius:14px;padding:1rem 1.1rem;">
@@ -4768,7 +4591,6 @@ body::after {
     </div>
 
 
-
   </div>
 </div>
 
@@ -4805,6 +4627,28 @@ const FIREBASE_CONFIG = {
 firebase.initializeApp(FIREBASE_CONFIG);
 const auth = firebase.auth();
 const db   = firebase.firestore();
+
+// ── Persistencia LOCAL explícita (sesión sobrevive cierre de app/browser) ──
+// Esto es clave para que iOS/Android no pidan contraseña cada vez
+auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL).catch(() => {});
+
+// ── Mostrar pantalla de inicio inmediatamente desde caché ──
+// Si hay un usuario cacheado, ocultamos el login y mostramos la app
+// mientras Firebase verifica la sesión en background
+(function arrancarDesdCache() {
+  const cached = (() => { try { return JSON.parse(localStorage.getItem('fl_user_v1') || 'null'); } catch(e) { return null; } })();
+  if (cached && cached.uid) {
+    // Tenemos sesión guardada — mostrar app directamente, sin esperar a Firebase
+    const sAuth = document.getElementById('s-auth');
+    const sApp  = document.getElementById('s-app');
+    if (sAuth) sAuth.style.display = 'none';
+    if (sApp)  sApp.style.display  = 'flex';
+  } else {
+    // No hay sesión — mostrar login directamente sin spinner de espera
+    const sAuth = document.getElementById('s-auth');
+    if (sAuth) sAuth.style.display = 'flex';
+  }
+})();
 
 // ── Firebase Cloud Messaging (Push Notifications) ─────────────────────────
 const FCM_VAPID_KEY = "BL_vmQADEnXpFeaXskLU28iU_0pWYhhbx8LqavBy9agyzmKdQok2gk9IUVT0Nx0MW-rLm08c7FwBRylQHZ07b4w";
@@ -4899,7 +4743,14 @@ async function notificarNuevoBenchmark(nombre, tipo) {
 }
 
 // Habilitar persistencia offline de Firestore
-db.enablePersistence({ synchronizeTabs: true }).catch(() => {});
+db.enablePersistence({ synchronizeTabs: false })
+  .catch(err => {
+    // En Safari privado o si ya está abierto en otra pestaña, falla silencioso
+    // No es crítico — la sesión igual se mantiene vía Firebase Auth LOCAL
+    if (err.code !== 'failed-precondition' && err.code !== 'unimplemented') {
+      console.warn('Firestore persistence:', err.code);
+    }
+  });
 
 // ══════════════════════════════════════════════
 //  CONSTANTES
@@ -5161,8 +5012,6 @@ const DRAWER_LABELS = {
   calculadorm:     '💪 Calculadora RM',
   feed:            '📣 Feed',
   calorias:        '🔥 Calorías',
-  profesores:      '🏫 Profesores',
-  misalumnos:      '🎓 Mis Alumnos',
   cmenstrual:      '🌸 C. Menstrual',
   terminos:        '📋 Términos',
 };
@@ -5199,7 +5048,7 @@ function actualizarDrawerUsuario() {
 }
 
 function switchTab(tab) {
-  const allTabs = ["resultados","relacion","graficos","pesocorporal","estiramientos","antropometricos","competencias","benchmark","calculadorm","calorias","cmenstrual","feed","profesores","misalumnos","terminos"];
+  const allTabs = ["resultados","relacion","graficos","pesocorporal","estiramientos","antropometricos","competencias","benchmark","calculadorm","calorias","cmenstrual","feed","terminos"];
   allTabs.forEach(t => {
     const tabEl = g("tab-"+t);
     if (tabEl) tabEl.classList.toggle("active", t===tab);
@@ -5218,8 +5067,6 @@ function switchTab(tab) {
   if (tab === "calorias") { calInit(); }
   if (tab === "cmenstrual")    renderCicloMenstrual();
   if (tab === "feed")          renderFeed();
-  if (tab === "profesores")  { renderPanelProfesores(); actualizarBloqueStaff(); }
-  if (tab === "misalumnos")  renderPanelMisAlumnos();
   // Botón flotante: solo visible en el panel de resultados
   const floatBtn = g("btn-save-float");
   if (floatBtn) floatBtn.style.display = tab === "resultados" ? "flex" : "none";
@@ -5595,8 +5442,6 @@ async function guardarRelacion() {
 
   showToast("💾 RELACIÓN GUARDADA — resultados actualizados");
 }
-
-
 
 
 // ══════════════════════════════════════════════
@@ -6449,7 +6294,6 @@ function bmCrearCard(bm, hist) {
 
   return card;
 }
-
 
 
 /* ══════════════════════════════════════════════
@@ -8284,7 +8128,6 @@ async function registerEmail() {
       }, { merge: true });
     } catch(e) { console.warn('Error asignando número de usuario:', e.message); }
     // Notificar al administrador por email
-    notifyAdminNuevoUsuario({ name, email });
   } catch(err) {
     setAuthLoading(false);
     const msgs = {
@@ -8315,6 +8158,7 @@ async function resetPassword() {
 //  GESTIÓN DE SESIÓN — onAuthStateChanged
 // ══════════════════════════════════════════════
 auth.onAuthStateChanged(async firebaseUser => {
+  // Solo llamamos setAuthLoading(false) si no entramos ya desde caché
   setAuthLoading(false);
 
   if (firebaseUser) {
@@ -8325,14 +8169,6 @@ auth.onAuthStateChanged(async firebaseUser => {
     // Ocultar secciones de entrenador para alumnos
     const _isAdmUser = esAdmin(loadUser());
     document.getElementById("s-app").classList.toggle("alumno-mode", !_isAdmUser);
-    // Show/hide professor tab
-    try {
-      const usnap = await db.collection('users').doc(firebaseUser.uid).get();
-      if (usnap.exists && usnap.data().role === 'profesor') {
-        const tabMisAlumnos = document.getElementById('tab-misalumnos');
-        if (tabMisAlumnos) tabMisAlumnos.style.display = 'inline-flex';
-      }
-    } catch(e) {}
 
     const user = {
       uid:      firebaseUser.uid,
@@ -8346,39 +8182,40 @@ auth.onAuthStateChanged(async firebaseUser => {
     actualizarUIAdmin(user);
     g("sync-wrap").style.display = "flex";
 
-    // ── Notificaciones Push ──
-    initFCM().then(() => {
-      solicitarPermisoPush(firebaseUser.uid);
-      initFCMForeground();
-    });
-
-    // Registrar última conexión
-    try {
-      db.collection("users").doc(firebaseUser.uid).set({
-        name: firebaseUser.displayName || "Usuario",
-        email: firebaseUser.email || "",
-        ultimaConexion: firebase.firestore.FieldValue.serverTimestamp()
-      }, { merge: true });
-    } catch(e) {}
-
-    // Sincronizar datos desde la nube
-    await sincronizarDesdNube(firebaseUser.uid);
-
-    // Activar listener en tiempo real
-    activarSyncTiempoReal(firebaseUser.uid);
-    // Cargar sexo biológico desde Firestore
-    cargarSexoDesdeFirestore(firebaseUser.uid);
-    // Cargar insignia de usuario
-    cargarInsigniaUsuario(firebaseUser.uid);
-
-    // Ir a la app
+    // ── Entrar a la app INMEDIATAMENTE desde caché local ──
+    // No esperamos a Firestore — la UI es instantánea
     g("s-auth").style.display = "none";
-    const pr = loadPR();
-    if (pr.snatch || pr.cleanJerk || pr.backSquat) {
-      entrarApp();
-    } else {
-      g("s-splash").style.display = "flex";
-    }
+    g("s-splash").style.display = "none";
+    g("s-app").style.display = "flex";
+    setTimeout(actualizarDrawerUsuario, 100);
+    cargarResultados();
+    actualizarRelacion();
+
+    // ── Sincronización en background (no bloquea la UI) ──
+    setTimeout(async () => {
+      // Registrar última conexión
+      try {
+        db.collection("users").doc(firebaseUser.uid).set({
+          name: firebaseUser.displayName || "Usuario",
+          email: firebaseUser.email || "",
+          ultimaConexion: firebase.firestore.FieldValue.serverTimestamp()
+        }, { merge: true });
+      } catch(e) {}
+
+      // Sincronizar datos desde la nube en background
+      await sincronizarDesdNube(firebaseUser.uid);
+
+      // Activar listener en tiempo real
+      activarSyncTiempoReal(firebaseUser.uid);
+      cargarSexoDesdeFirestore(firebaseUser.uid);
+      cargarInsigniaUsuario(firebaseUser.uid);
+
+      // Notificaciones Push
+      initFCM().then(() => {
+        solicitarPermisoPush(firebaseUser.uid);
+        initFCMForeground();
+      });
+    }, 300); // 300ms después de que la UI ya está visible
 
   } else {
     // Sin sesión
@@ -8790,9 +8627,6 @@ function vincularBarClick() {
 }
 
 
-
-
-
 document.addEventListener("click", e => {
   const wrap = g("topbar-user-wrap");
   if (wrap && !wrap.contains(e.target)) g("user-menu")?.classList.remove("open");
@@ -9021,12 +8855,9 @@ function abrirPanelAdmin() {
   g('adm-tab-usuarios')?.classList.add('active');
   g('adm-tab-profesores')?.classList.remove('active');
   g('adm-panel-usuarios')?.classList.remove('hidden');
-  g('adm-panel-profesores')?.classList.add('hidden');
   // Cargar datos
   cargarMensajesSoporte();
   cargarUsuariosAdmin();
-  // Verificar si hay solicitudes de staff pendientes (para el badge)
-  admCargarSolicitudesStaffBadge();
 }
 
 function cerrarPanelAdmin() {
@@ -9034,235 +8865,6 @@ function cerrarPanelAdmin() {
   document.body.style.overflow = "";
 }
 
-
-/* ══════════════════════════════════════════════
-   ADMIN — VINCULAR ALUMNO CON PROFESOR
-══════════════════════════════════════════════ */
-
-
-/* ══════════════════════════════════════════════
-   ADMIN — SESIÓN SEMANAL DE VINCULACIÓN
-   Muestra todos los alumnos sin profesor para
-   que el admin elija a cuál vincular
-══════════════════════════════════════════════ */
-async function admAbrirSesionVinculacion() {
-  document.getElementById('modal-adm-sesion-vincular')?.remove();
-
-  const overlay = document.createElement('div');
-  overlay.id = 'modal-adm-sesion-vincular';
-  overlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,.88);z-index:9999;display:flex;align-items:center;justify-content:center;padding:1.2rem;backdrop-filter:blur(10px);';
-
-  overlay.innerHTML = `
-    <div style="background:var(--bg2);border:1px solid var(--border);border-radius:16px;padding:1.4rem;width:100%;max-width:420px;display:flex;flex-direction:column;gap:.85rem;max-height:90vh;overflow-y:auto;">
-      <div style="display:flex;align-items:center;justify-content:space-between;">
-        <div>
-          <div style="font-family:var(--fd);font-size:20px;letter-spacing:1px;">🗓 Vinculación semanal</div>
-          <div style="font-size:13px;color:var(--muted);margin-top:.1rem;">Elegí un alumno para vincular con un profesor</div>
-        </div>
-        <button onclick="document.getElementById('modal-adm-sesion-vincular').remove()" style="background:none;border:none;color:var(--muted);font-size:22px;cursor:pointer;">✕</button>
-      </div>
-      <div id="adm-sv-loading" style="text-align:center;padding:1rem;color:var(--muted);font-family:var(--fb);font-size:14px;">
-        <div class="auth-spinner" style="margin:0 auto .4rem;"></div>Cargando alumnos…
-      </div>
-      <div id="adm-sv-list" style="display:flex;flex-direction:column;gap:.4rem;"></div>
-    </div>`;
-
-  document.body.appendChild(overlay);
-  overlay.addEventListener('click', e => { if (e.target === overlay) overlay.remove(); });
-
-  try {
-    const snap = await db.collection('users').get();
-    const sinProfesor = [];
-    snap.forEach(doc => {
-      const d = doc.data();
-      if (d.role === 'profesor') return; // excluir profesores
-      if (d.vinculoEstado === 'vinculado' || d.vinculoEstado === 'pendiente') return;
-      sinProfesor.push({ uid: doc.id, ...d });
-    });
-
-    sinProfesor.sort((a, b) => {
-      const ta = a.ultimaConexion?.toMillis?.() || 0;
-      const tb = b.ultimaConexion?.toMillis?.() || 0;
-      return tb - ta;
-    });
-
-    const loadingEl = document.getElementById('adm-sv-loading');
-    const listEl    = document.getElementById('adm-sv-list');
-    if (loadingEl) loadingEl.remove();
-
-    if (!sinProfesor.length) {
-      listEl.innerHTML = '<div style="background:rgba(16,185,129,.08);border:1px solid rgba(16,185,129,.3);border-radius:10px;padding:.85rem 1rem;font-size:15px;color:var(--green);">✅ Todos los alumnos ya tienen un profesor asignado o solicitud pendiente.</div>';
-      return;
-    }
-
-    listEl.innerHTML = '<div style="font-size:13px;color:var(--muted);font-family:var(--fb);letter-spacing:.06em;text-transform:uppercase;margin-bottom:.1rem;">' + sinProfesor.length + ' sin profesor</div>';
-
-    sinProfesor.forEach(u => {
-      const nombre = u.name || u.displayName || 'Sin nombre';
-      const ini    = iniciales(nombre);
-      const ts     = u.ultimaConexion?.toMillis?.() || 0;
-      const card   = document.createElement('div');
-      card.style.cssText = 'background:var(--bg4);border:1px solid var(--border);border-radius:12px;padding:.65rem .9rem;display:flex;align-items:center;gap:.7rem;cursor:pointer;transition:border-color .15s;';
-      card.onmouseenter = () => card.style.borderColor = 'var(--blue)';
-      card.onmouseleave = () => card.style.borderColor = 'var(--border)';
-      card.innerHTML =
-        '<div style="width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,var(--blue),var(--blue2));display:flex;align-items:center;justify-content:center;font-family:var(--fd);font-size:15px;color:#fff;flex-shrink:0;">' + ini + '</div>' +
-        '<div style="flex:1;min-width:0;">' +
-          '<div style="font-family:var(--fd);font-size:17px;color:var(--text);">' + escHtml(nombre) + '</div>' +
-          '<div style="font-size:12px;color:var(--muted);">' + escHtml(u.email || '') + (ts ? ' · ' + formatFechaRelativa(ts) : '') + '</div>' +
-        '</div>' +
-        '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="var(--blue3)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>';
-      card.onclick = () => {
-        document.getElementById('modal-adm-sesion-vincular')?.remove();
-        admAbrirVincularConProfesor(u.uid, nombre);
-      };
-      listEl.appendChild(card);
-    });
-  } catch(e) {
-    const loadingEl = document.getElementById('adm-sv-loading');
-    if (loadingEl) loadingEl.innerHTML = '<p style="color:var(--red);">Error: ' + e.message + '</p>';
-  }
-}
-
-async function admAbrirVincularConProfesor(alumnoUid, alumnoNombre) {
-  // Remover modal anterior
-  document.getElementById('modal-adm-vincular')?.remove();
-
-  const overlay = document.createElement('div');
-  overlay.id = 'modal-adm-vincular';
-  overlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,.88);z-index:9999;display:flex;align-items:center;justify-content:center;padding:1.2rem;backdrop-filter:blur(10px);';
-
-  overlay.innerHTML = `
-    <div style="background:var(--bg2);border:1px solid var(--border);border-radius:16px;padding:1.4rem;width:100%;max-width:400px;display:flex;flex-direction:column;gap:.85rem;max-height:90vh;overflow-y:auto;">
-      <div style="display:flex;align-items:center;justify-content:space-between;">
-        <div style="font-family:var(--fd);font-size:19px;letter-spacing:1px;">🔗 Vincular con Profesor</div>
-        <button onclick="document.getElementById('modal-adm-vincular').remove()" style="background:none;border:none;color:var(--muted);font-size:22px;cursor:pointer;">✕</button>
-      </div>
-      <div style="background:rgba(37,99,235,.08);border:1px solid rgba(37,99,235,.2);border-radius:10px;padding:.7rem .9rem;">
-        <div style="font-size:13px;color:var(--muted);margin-bottom:.15rem;font-family:var(--fb);letter-spacing:.06em;text-transform:uppercase;">Alumno</div>
-        <div style="font-family:var(--fd);font-size:20px;color:var(--text);">${escHtml(alumnoNombre)}</div>
-      </div>
-      <div style="font-size:14px;color:var(--muted);">Elegí el profesor al que querés vincular este alumno. Se enviará una notificación al alumno para que acepte o rechace.</div>
-      <div id="adm-prof-list-loading" style="text-align:center;padding:.8rem;color:var(--muted);font-family:var(--fb);font-size:14px;">
-        <div class="auth-spinner" style="margin:0 auto .4rem;"></div>Cargando profesores…
-      </div>
-      <div id="adm-prof-list" style="display:flex;flex-direction:column;gap:.5rem;"></div>
-    </div>`;
-
-  document.body.appendChild(overlay);
-  overlay.addEventListener('click', e => { if (e.target === overlay) overlay.remove(); });
-
-  // Cargar profesores — usar overlay como scope para evitar conflictos de ID
-  const _renderProfList = async () => {
-    const loadingEl = overlay.querySelector('#adm-prof-list-loading');
-    const listEl    = overlay.querySelector('#adm-prof-list');
-
-    try {
-      // Intentar sin filtro primero (admin tiene acceso total)
-      let snap;
-      try {
-        snap = await db.collection('profesores_registrados').get();
-      } catch(e1) {
-        // Fallback: filtrar por habilitado si falla sin filtro
-        snap = await db.collection('profesores_registrados').where('habilitado','==',true).get();
-      }
-
-      const profs = [];
-      snap.forEach(doc => {
-        const d = doc.data();
-        if (d.nombre) profs.push({ id: doc.id, ...d });
-      });
-      profs.sort((a,b) => (a.nombre||'').localeCompare(b.nombre||''));
-
-      if (loadingEl) loadingEl.remove();
-
-      if (!profs.length) {
-        listEl.innerHTML = '<p style="color:var(--muted);font-size:15px;padding:.5rem 0;">No hay profesores registrados aún.</p>';
-        return;
-      }
-
-      listEl.innerHTML = '';
-      profs.forEach(p => {
-        const ini  = iniciales(p.nombre || '?');
-        const card = document.createElement('div');
-        card.style.cssText = 'background:var(--bg4);border:1px solid var(--border);border-radius:12px;padding:.7rem .9rem;display:flex;align-items:center;gap:.75rem;cursor:pointer;transition:border-color .15s;';
-        card.onmouseenter = () => card.style.borderColor = 'var(--blue)';
-        card.onmouseleave = () => card.style.borderColor = 'var(--border)';
-        const estadoColor = p.perfilEstado === 'activo' ? 'var(--green)' : p.perfilEstado === 'pendiente' ? 'var(--yellow)' : 'var(--muted)';
-        const estadoLabel = p.perfilEstado === 'activo' ? '✅ activo' : p.perfilEstado === 'pendiente' ? '⏳ pendiente' : p.perfilEstado === 'revision' ? '🔄 revisión' : p.habilitado ? '🟡 habilitado' : '⚫ sin estado';
-        card.innerHTML =
-          '<div style="width:38px;height:38px;border-radius:50%;background:linear-gradient(135deg,#7c3aed,#a78bfa);display:flex;align-items:center;justify-content:center;font-family:var(--fd);font-size:16px;color:#fff;flex-shrink:0;">' + ini + '</div>' +
-          '<div style="flex:1;min-width:0;">' +
-            '<div style="font-family:var(--fd);font-size:18px;color:var(--text);">' + escHtml(p.nombre || 'Profesor') + '</div>' +
-            '<div style="display:flex;gap:.5rem;align-items:center;flex-wrap:wrap;margin-top:.1rem;">' +
-              (p.especialidad ? '<span style="font-size:12px;color:var(--blue3);font-weight:700;">' + escHtml(p.especialidad) + '</span>' : '') +
-              '<span style="font-size:11px;color:' + estadoColor + ';font-weight:700;">' + estadoLabel + '</span>' +
-            '</div>' +
-          '</div>' +
-          '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--muted)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>';
-        card.onclick = () => admConfirmarVinculacion(alumnoUid, alumnoNombre, p.id, p.nombre || 'Profesor');
-        listEl.appendChild(card);
-      });
-    } catch(e) {
-      if (loadingEl) loadingEl.innerHTML =
-        '<p style="color:var(--red);font-size:14px;line-height:1.5;">⚠️ Error al cargar profesores:<br>' + escHtml(e.message) + '</p>';
-    }
-  };
-  _renderProfList();
-}
-
-function admConfirmarVinculacion(alumnoUid, alumnoNombre, profSlotId, profNombre) {
-  document.getElementById('modal-adm-vincular')?.remove();
-
-  mostrarConfirm(
-    'Confirmar vinculación',
-    'Vincular <strong>' + escHtml(alumnoNombre) + '</strong> con el profesor <strong>' + escHtml(profNombre) + '</strong>.<br><br>' +
-    '<span style="font-size:14px;color:var(--muted);">Se enviará una notificación al alumno para que acepte o rechace la vinculación.</span>',
-    async () => {
-      try {
-        // 1. Crear solicitud de vinculación en nombre del admin
-        const alumnoDoc = await db.collection('users').doc(alumnoUid).get();
-        const alumnoData = alumnoDoc.exists ? alumnoDoc.data() : {};
-
-        await db.collection('solicitudes_vinculacion').add({
-          alumnoUid,
-          alumnoNombre: alumnoData.name || alumnoData.displayName || alumnoNombre,
-          alumnoEmail:  alumnoData.email || '',
-          profSlotId,
-          estado:       'pendiente',
-          origenAdmin:  true,
-          ts:           firebase.firestore.FieldValue.serverTimestamp()
-        });
-
-        // 2. Marcar al alumno como pendiente
-        const permisosDefault = {};
-        PERMISOS_DEF.forEach(p => { permisosDefault[p.key] = true; });
-        await db.collection('users').doc(alumnoUid).set({
-          profesorId:    profSlotId,
-          vinculoEstado: 'pendiente',
-          permisos:      permisosDefault
-        }, { merge: true });
-
-        // 3. Enviar notificación al alumno en su inbox
-        await db.collection('fl_inbox').doc(alumnoUid).collection('mensajes').add({
-          texto:     '🔗 El administrador quiere vincularte con el profesor ' + profNombre + '. ¿Aceptás? Andá a la pestaña PROFESORES para confirmar o rechazar.',
-          de:        'Administrador',
-          deRole:    'admin',
-          tipo:      'solicitud_vinculacion_admin',
-          profSlotId,
-          profNombre,
-          timestamp: firebase.firestore.FieldValue.serverTimestamp(),
-          leido:     false
-        });
-
-        showToast('✅ Solicitud enviada — el alumno recibirá la notificación');
-        cargarUsuariosAdmin();
-      } catch(e) {
-        showToast('❌ Error: ' + e.message);
-      }
-    }
-  );
-}
 
 async function cargarUsuariosAdmin() {
   const listEl  = g("adm-user-list");
@@ -9369,7 +8971,6 @@ async function cargarUsuariosAdmin() {
             <span>${fechaStr}</span>
           </div>
         </div>
-        ${u.vinculoEstado === 'vinculado' || u.vinculoEstado === 'pendiente' ? `<button onclick="admDesvincularAlumno('${u.uid}','${nombre.replace(/'/g,"\\'")}','${u.profesorId||''}')" title="Desvincular profesor" style="background:rgba(245,158,11,.12);border:1px solid rgba(245,158,11,.3);border-radius:8px;color:var(--yellow);font-family:var(--fb);font-size:9px;font-weight:900;letter-spacing:.08em;padding:.25rem .4rem;cursor:pointer;flex-shrink:0;">${u.vinculoEstado==='pendiente'?'⏳ DESVÍNC.':'✅ DESVÍNC.'}</button>` : `<button onclick="admAbrirVincularConProfesor('${u.uid}','${nombre.replace(/'/g,"\'")}')" style="background:rgba(37,99,235,.12);border:1px solid rgba(37,99,235,.3);border-radius:8px;color:var(--blue3);font-family:var(--fb);font-size:9px;font-weight:900;letter-spacing:.08em;padding:.25rem .4rem;cursor:pointer;flex-shrink:0;">🔗 VINCULAR</button>`}
         <button class="admin-msg-btn" onclick="abrirMsgModal('${u.uid}', '${nombre.replace(/'/g,"\'")}')">
           <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
           MSG
@@ -9396,6 +8997,223 @@ function formatFechaRelativa(ts) {
   if (dias < 7)  return `Hace ${dias} día${dias > 1 ? "s" : ""}`;
   return new Date(ts).toLocaleDateString("es-PY", { day:"numeric", month:"short" });
 }
+
+function admMarcarBienvenida(uid) {
+  try {
+    let ws = new Set();
+    const stored = localStorage.getItem('fl_welcome_sent');
+    if (stored) ws = new Set(JSON.parse(stored));
+    ws.add(uid);
+    localStorage.setItem('fl_welcome_sent', JSON.stringify([...ws]));
+    setTimeout(() => {
+      const row = g('email-row-' + uid);
+      if (row && !row.textContent.trimStart().startsWith('✅')) {
+        row.innerHTML = '✅ ' + row.innerHTML;
+      }
+    }, 400);
+  } catch(e) {}
+}
+
+
+// ══════════════════════════════════════════════
+//  ADMIN — MENSAJES DE SOPORTE
+// ══════════════════════════════════════════════
+async function cargarMensajesSoporte() {
+  const listEl  = g('adm-soporte-list');
+  const countEl = g('adm-soporte-count');
+  if (!listEl) return;
+  listEl.innerHTML = `<div class="admin-loading" style="padding:.8rem 0"><div class="auth-spinner" style="width:14px;height:14px;border-width:2px"></div> CARGANDO…</div>`;
+  try {
+    const snap = await db.collection('fl_soporte').orderBy('timestamp', 'desc').get();
+    const msgs = [];
+    snap.forEach(doc => msgs.push({ id: doc.id, ...doc.data() }));
+
+    if (countEl) countEl.textContent = msgs.length + ' mensaje' + (msgs.length !== 1 ? 's' : '');
+    const unread = msgs.filter(m => !m.leido).length;
+    const b = g('adm-badge-msgs');
+    if (b) { b.textContent = unread; b.style.display = unread > 0 ? 'inline-block' : 'none'; }
+
+    if (msgs.length === 0) {
+      listEl.innerHTML = `<p class="empty-msg" style="padding:1.5rem 0">No hay mensajes de soporte aún.</p>`;
+      return;
+    }
+    listEl.innerHTML = '';
+    msgs.forEach(m => {
+      const nombre = m.nombre || m.de || 'Usuario';
+      const uid    = m.uid || '';
+      const texto  = m.texto || '';
+      const fecha  = m.timestamp ? formatFechaRelativa(m.timestamp.toMillis()) : '—';
+      const card   = document.createElement('div');
+      card.className = 'admin-user-card';
+      card.style.cssText = 'flex-direction:column;align-items:flex-start;gap:.4rem;';
+      card.innerHTML = `
+        <div style="display:flex;align-items:center;gap:.5rem;width:100%">
+          <div class="admin-user-avatar" style="font-size:11px">${getInitials(nombre)}</div>
+          <div style="flex:1">
+            <div class="admin-user-name">${nombre}</div>
+            <div class="admin-user-meta"><span>${fecha}</span>${m.categoria ? ' · ' + m.categoria : ''}</div>
+          </div>
+          ${!m.leido ? '<span style="background:var(--blue);color:#fff;font-size:10px;padding:2px 6px;border-radius:4px;font-weight:700;letter-spacing:.06em">NUEVO</span>' : ''}
+        </div>
+        <div style="font-family:var(--fb);font-size:14px;color:var(--muted);line-height:1.5;padding-left:.3rem;word-break:break-word;">${texto}</div>
+        ${uid ? `<button onclick="abrirMsgModal('${uid}','${nombre.replace(/'/g,"\\'")}'); marcarSoporteLeido('${m.id}')" class="admin-msg-btn" style="align-self:flex-end">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+          RESPONDER
+        </button>` : ''}`;
+      listEl.appendChild(card);
+    });
+  } catch(err) {
+    if (countEl) countEl.textContent = '—';
+    listEl.innerHTML = `<p class="empty-msg" style="padding:1.5rem 0;color:var(--red)">Error al cargar mensajes: ${err.message}</p>`;
+  }
+}
+
+function marcarSoporteLeido(docId) {
+  try { db.collection('fl_soporte').doc(docId).update({ leido: true }); } catch(e) {}
+}
+
+// ══════════════════════════════════════════════
+//  USUARIO — ENVIAR MENSAJE AL SOPORTE
+// ══════════════════════════════════════════════
+function cerrarModalSoporte() {
+  g('soporte-modal')?.classList.add('hidden');
+}
+
+async function enviarMensajeSoporte() {
+  const texto = g('soporte-textarea')?.value.trim();
+  if (!texto) { showToast('⚠ Escribí tu mensaje primero'); return; }
+  const user = auth.currentUser;
+  if (!user) { showToast('⚠ Debés estar logueado'); return; }
+
+  const btn = g('soporte-send-btn');
+  if (btn) { btn.disabled = true; btn.textContent = 'ENVIANDO…'; }
+
+  try {
+    await db.collection('fl_soporte').add({
+      uid:       user.uid,
+      nombre:    user.displayName || 'Usuario',
+      email:     user.email || '',
+      texto,
+      categoria: _soporteCat || 'sugerencia',
+      timestamp: firebase.firestore.FieldValue.serverTimestamp(),
+      leido:     false
+    });
+    cerrarModalSoporte();
+    showToast('✅ MENSAJE ENVIADO AL SOPORTE');
+  } catch(err) {
+    showToast('❌ Error al enviar: ' + err.message);
+  } finally {
+    if (btn) {
+      btn.disabled = false;
+      btn.innerHTML = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg> ENVIAR AL SOPORTE`;
+    }
+  }
+}
+
+// ══════════════════════════════════════════════
+//  ADMIN — MODAL ENVIAR A TODOS
+// ══════════════════════════════════════════════
+let _masivoUsers = [];
+
+async function abrirModalMasivo() {
+  g('masivo-modal')?.classList.remove('hidden');
+  g('masivo-textarea').value = '';
+  g('masivo-destinatarios').textContent = 'Cargando destinatarios…';
+  g('masivo-count-label').textContent = '';
+
+  try {
+    const snap = await db.collection('users').get();
+    _masivoUsers = [];
+    snap.forEach(doc => {
+      const d = doc.data();
+      if (d.email) _masivoUsers.push({ uid: doc.id, email: d.email, name: d.name || d.displayName || d.email });
+    });
+    const emails = _masivoUsers.map(u => u.email).join(', ');
+    g('masivo-destinatarios').textContent = emails || 'Sin destinatarios con email';
+    g('masivo-count-label').textContent = _masivoUsers.length + ' destinatario' + (_masivoUsers.length !== 1 ? 's' : '');
+  } catch(err) {
+    g('masivo-destinatarios').textContent = 'Error al cargar: ' + err.message;
+  }
+}
+
+function cerrarModalMasivo() {
+  g('masivo-modal')?.classList.add('hidden');
+  _masivoUsers = [];
+}
+
+async function enviarMasivo() {
+  const texto = g('masivo-textarea')?.value.trim();
+  if (!texto) { showToast('⚠ Escribí el mensaje primero'); return; }
+  if (_masivoUsers.length === 0) { showToast('⚠ No hay destinatarios'); return; }
+
+  const btn = g('masivo-send-btn');
+  if (btn) { btn.disabled = true; btn.textContent = 'ENVIANDO…'; }
+
+  try {
+    const total = _masivoUsers.length;
+    let enviados = 0;
+    // Firestore permite máximo 500 ops por batch
+    const CHUNK = 400;
+    for (let i = 0; i < _masivoUsers.length; i += CHUNK) {
+      const batch = db.batch();
+      const chunk = _masivoUsers.slice(i, i + CHUNK);
+      chunk.forEach(u => {
+        const ref = db.collection('fl_inbox').doc(u.uid).collection('mensajes').doc();
+        batch.set(ref, {
+          texto,
+          de:        'Equipo Fit Ladder',
+          deRole:    'admin',
+          timestamp: firebase.firestore.FieldValue.serverTimestamp(),
+          leido:     false
+        });
+      });
+      await batch.commit();
+      enviados += chunk.length;
+      if (btn) btn.textContent = `ENVIANDO… ${enviados}/${total}`;
+    }
+
+    // Actualizar contador de mensajes enviados en stats
+    const el = g('adm-stat-msgs');
+    if (el) el.textContent = (parseInt(el.textContent) || 0) + total;
+
+    cerrarModalMasivo();
+    showToast(`✅ MENSAJE ENVIADO A ${total} USUARIOS`);
+  } catch(err) {
+    showToast('❌ Error al enviar: ' + err.message);
+  } finally {
+    if (btn) {
+      btn.disabled = false;
+      btn.innerHTML = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg> ENVIAR A TODOS`;
+    }
+  }
+}
+
+function pedirEliminarUsuario(uid, nombre, btnEl) {
+  mostrarConfirm(
+    "ELIMINAR CUENTA",
+    `¿Eliminar los datos de <strong>${nombre}</strong> de Firestore?<br><br>
+    <span style="color:var(--red);font-size:17px;font-weight:700">Esta acción no se puede deshacer.</span>`,
+    () => eliminarUsuarioFirestore(uid, nombre, btnEl)
+  );
+}
+
+async function eliminarUsuarioFirestore(uid, nombre, btnEl) {
+  if (btnEl) { btnEl.style.opacity = ".4"; btnEl.style.pointerEvents = "none"; }
+  try {
+    const msgsSnap = await db.collection("fl_inbox").doc(uid).collection("mensajes").get();
+    const batch = db.batch();
+    msgsSnap.forEach(doc => batch.delete(doc.ref));
+    batch.delete(db.collection("fl_inbox").doc(uid));
+    batch.delete(db.collection("users").doc(uid));
+    await batch.commit();
+    showToast("🗑 " + nombre.toUpperCase() + " ELIMINADO");
+    setTimeout(() => cargarUsuariosAdmin(), 400);
+  } catch(err) {
+    if (btnEl) { btnEl.style.opacity = "1"; btnEl.style.pointerEvents = "all"; }
+    showToast("❌ Error: " + err.message);
+  }
+}
+
 
 // ══════════════════════════════════════════════
 //  ADMIN — MODAL ENVIAR MENSAJE
@@ -9479,1457 +9297,6 @@ function abrirModalSoporte() {
 }
 
 
-/* ── Solicitud de staff desde panel Profesores ── */
-document.addEventListener('change', function(e) {
-  if (e.target && e.target.id === 'staff-esp-inp') {
-    const otro = g('staff-esp-otro-inp');
-    if (otro) otro.style.display = e.target.value === 'Otro' ? 'block' : 'none';
-  }
-});
-
-async function enviarSolicitudStaff() {
-  const user = auth.currentUser;
-  if (!user) { showToast('⚠ Necesitás iniciar sesión para enviar tu solicitud'); return; }
-  const nombre = g('staff-nombre-inp')?.value.trim();
-  const espSel = g('staff-esp-inp')?.value;
-  const espOtro = g('staff-esp-otro-inp')?.value.trim();
-  const especialidad = espSel === 'Otro' ? espOtro : espSel;
-  const bio    = g('staff-bio-inp')?.value.trim();
-  const ig     = g('staff-ig-inp')?.value.trim().replace('@','');
-  const msgEl  = g('staff-msg');
-  const btn    = g('staff-submit-btn');
-  const setMsg = (t,c) => { if(msgEl){msgEl.textContent=t;msgEl.style.color=c||'var(--muted)';} };
-
-  if (!nombre)       { setMsg('⚠ Ingresá tu nombre completo','var(--red)'); return; }
-  if (!especialidad) { setMsg('⚠ Seleccioná tu especialidad','var(--red)'); return; }
-  if (!bio)          { setMsg('⚠ Escribí tu descripción/bio','var(--red)'); return; }
-
-  btn.disabled = true;
-  btn.textContent = 'ENVIANDO…';
-  setMsg('', '');
-
-  try {
-    // Verificar si ya mandó solicitud
-    const existSnap = await db.collection('fl_soporte')
-      .where('uid','==',user.uid).where('categoria','==','quiero_staff').limit(1).get();
-    if (!existSnap.empty) {
-      setMsg('⚠ Ya enviaste una solicitud. El administrador la revisará pronto.','var(--yellow)');
-      btn.disabled = false; btn.textContent = '📤 ENVIAR SOLICITUD'; return;
-    }
-    const userData = await db.collection('users').doc(user.uid).get();
-    const userEmail = userData.data()?.email || user.email || '';
-    const userNombreReg = userData.data()?.name || userData.data()?.displayName || nombre;
-
-    // Guardar en Firestore como soporte con toda la info del perfil
-    await db.collection('fl_soporte').add({
-      uid:          user.uid,
-      nombre,
-      email:        userEmail,
-      categoria:    'quiero_staff',
-      catLabel:     '🎓 Quiero ser del staff',
-      texto:        '--- Solicitud de staff --- | Nombre: '+nombre+' | Especialidad: '+especialidad+' | Bio: '+bio+(ig?' | Instagram: @'+ig:''),
-      perfil:       { nombre, especialidad, bio, ig },
-      timestamp:    firebase.firestore.FieldValue.serverTimestamp(),
-      leido:        false
-    });
-
-    setMsg('✅ Solicitud enviada. Revisá tu correo, te notificaremos la decisión del administrador.','var(--green)');
-    // Ocultar formulario y mostrar estado
-    setTimeout(() => {
-      const body = g('staff-solicitud-body');
-      if (body) body.innerHTML = `
-        <div style="background:rgba(16,185,129,.08);border:1px solid rgba(16,185,129,.3);border-radius:12px;padding:.9rem 1rem;display:flex;flex-direction:column;gap:.5rem;">
-          <div style="font-size:16px;font-weight:700;color:var(--green);">✅ Solicitud enviada</div>
-          <div style="font-size:15px;color:var(--muted);line-height:1.5;">Tu solicitud fue recibida. El administrador la revisará y te notificará por correo electrónico.<br><strong style="color:var(--text);">Revisá tu correo (${escHtml(userEmail)}) en las próximas horas.</strong></div>
-        </div>`;
-    }, 2000);
-  } catch(e) {
-    setMsg('❌ Error: ' + e.message, 'var(--red)');
-    btn.disabled = false; btn.textContent = '📤 ENVIAR SOLICITUD';
-  }
-}
-
-// Mostrar/ocultar el bloque de solicitud según si el usuario ya es profesor o ya mandó solicitud
-async function actualizarBloqueStaff() {
-  const blk = g('staff-solicitud-blk');
-  if (!blk) return;
-  const user = auth.currentUser;
-  if (!user) return;
-  try {
-    const ud = await db.collection('users').doc(user.uid).get();
-    if (ud.data()?.role === 'profesor') { blk.style.display = 'none'; return; }
-    const sol = await db.collection('fl_soporte')
-      .where('uid','==',user.uid).where('categoria','==','quiero_staff').limit(1).get();
-    if (!sol.empty) {
-      const body = g('staff-solicitud-body');
-      const userEmail = ud.data()?.email || user.email || '';
-      if (body) body.innerHTML = `
-        <div style="background:rgba(245,158,11,.08);border:1px solid rgba(245,158,11,.3);border-radius:12px;padding:.85rem 1rem;">
-          <div style="font-size:15px;font-weight:700;color:var(--yellow);margin-bottom:.25rem;">⏳ Solicitud en revisión</div>
-          <div style="font-size:14px;color:var(--muted);line-height:1.5;">Tu solicitud está siendo revisada. Te notificaremos a <strong style="color:var(--text);">${escHtml(userEmail)}</strong>.</div>
-        </div>`;
-    }
-  } catch(e) {}
-}
-
-function abrirSoporteStaff() {
-  cerrarInbox();
-  g("soporte-modal").classList.remove("hidden");
-  // Pre-seleccionar categoría "quiero_staff"
-  _soporteCat = "quiero_staff";
-  document.querySelectorAll("#soporte-cats .soporte-cat-btn")
-    .forEach(b => b.classList.toggle("active", b.getAttribute("data-cat") === "quiero_staff"));
-  // Pre-cargar texto de presentación
-  const ta = g("soporte-textarea");
-  ta.value = "Hola, me gustaría formar parte del staff de Fit Ladder como profesor/profesional de la salud.\n\nNombre: \nEspecialidad: \nExperiencia: \nContacto: ";
-  g("soporte-char-count").textContent = ta.value.length;
-  ta.focus();
-}
-
-function cerrarModalSoporte() {
-  g("soporte-modal").classList.add("hidden");
-}
-
-async function enviarMensajeSoporte() {
-  const user = auth.currentUser;
-  if (!user) { showToast("⚠ Iniciá sesión primero"); return; }
-  const texto = g("soporte-textarea").value.trim();
-  if (!texto) { showToast("⚠ Escribí un mensaje primero"); return; }
-
-  const btn = g("soporte-send-btn");
-  btn.disabled = true;
-  btn.textContent = "ENVIANDO…";
-
-  const catLabels = { sugerencia:"💡 Sugerencia", correccion:"✏️ Corrección", error:"🐛 Error", quiero_staff:"🎓 Quiero ser del staff", otro:"💬 Otro" };
-
-  try {
-    const userData = await db.collection("users").doc(user.uid).get();
-    const nombre   = userData.data()?.name || userData.data()?.displayName || user.email || "Usuario";
-
-    await db.collection("fl_soporte").add({
-      uid:       user.uid,
-      nombre,
-      email:     user.email || "",
-      categoria: _soporteCat,
-      catLabel:  catLabels[_soporteCat] || _soporteCat,
-      texto,
-      timestamp: firebase.firestore.FieldValue.serverTimestamp(),
-      leido:     false
-    });
-
-    cerrarModalSoporte();
-    showToast("✅ MENSAJE ENVIADO AL SOPORTE");
-  } catch(err) {
-    showToast("❌ Error al enviar: " + err.message);
-  } finally {
-    btn.disabled = false;
-    btn.innerHTML = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg> ENVIAR AL SOPORTE`;
-  }
-}
-
-// Cerrar modal soporte al tocar afuera
-document.addEventListener("DOMContentLoaded", () => {
-  g("soporte-modal")?.addEventListener("click", e => {
-    if (e.target === g("soporte-modal")) cerrarModalSoporte();
-  });
-});
-
-// Carga mensajes de usuarios en el panel admin
-async function cargarMensajesSoporte() {
-  const listEl = g("adm-soporte-list");
-  const countEl = g("adm-soporte-count");
-  if (!listEl) return;
-
-  try {
-    let snap;
-    try {
-      snap = await db.collection("fl_soporte").orderBy("timestamp", "desc").get();
-    } catch(e) {
-      snap = await db.collection("fl_soporte").get();
-    }
-
-    if (snap.empty) {
-      listEl.innerHTML = `<p class="empty-msg" style="padding:.5rem 0">Sin mensajes aún.</p>`;
-      if (countEl) countEl.textContent = "0 mensajes";
-      return;
-    }
-
-    const docs = [];
-    snap.forEach(doc => docs.push({ id: doc.id, ref: doc.ref, data: doc.data() }));
-    docs.sort((a,b) => {
-      const ta = a.data.timestamp?.toMillis?.() || 0;
-      const tb = b.data.timestamp?.toMillis?.() || 0;
-      return tb - ta;
-    });
-
-    const unread = docs.filter(d => !d.data.leido).length;
-    if (countEl) countEl.innerHTML = docs.length + " mensajes" + (unread > 0 ? ` <span class="adm-soporte-badge">${unread}</span>` : "");
-
-    listEl.innerHTML = "";
-    const batch = db.batch();
-
-    docs.forEach(({ id, ref, data: d }) => {
-      const ts   = d.timestamp?.toMillis?.() || Date.now();
-      const item = document.createElement("div");
-      item.className = "adm-soporte-item" + (d.leido ? "" : " unread");
-      item.innerHTML =
-        `<div style="display:flex;align-items:center;justify-content:space-between;gap:.5rem">
-          <div style="font-family:var(--fb);font-size:17px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:var(--blue3)">${d.nombre || "Usuario"}</div>
-          <div style="font-family:var(--fb);font-size:16px;color:var(--muted)">${formatFechaRelativa(ts)}</div>
-        </div>
-        <div style="font-family:var(--fb);font-size:16px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)">${d.catLabel || d.categoria || "Mensaje"}</div>
-        <div style="font-family:var(--fb);font-size:19px;color:var(--text);line-height:1.55">${d.texto}</div>
-        <div style="display:flex;gap:.4rem;margin-top:.2rem">
-          ${d.categoria === 'quiero_staff' && d.email ? `<button class="admin-tool-btn" style="font-size:16px;padding:.35rem .6rem;color:#a78bfa;border-color:rgba(124,58,237,.35);" onclick="admEmailStaff('${d.email}','${(d.nombre||'').replace(/'/g,"\\'")}','${d.perfil ? JSON.stringify(d.perfil).replace(/'/g,"\\'").replace(/"/g,'&quot;') : ''}')">✉ Email prof.</button>` : ''}
-          <button class="admin-tool-btn" style="font-size:16px;padding:.35rem .6rem" onclick="responderSoporte('${d.uid}','${(d.nombre||'Usuario').replace(/'/g,"\'")}','${id}')">
-            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 17 4 12 9 7"/><path d="M20 18v-2a4 4 0 0 0-4-4H4"/></svg>
-            Responder
-          </button>
-          <button class="admin-tool-btn" style="font-size:16px;padding:.35rem .6rem;color:var(--red);border-color:rgba(244,63,94,.3)" onclick="marcarSoporteLeido('${id}',this)">
-            ✓ Marcar leído
-          </button>
-        </div>`;
-      listEl.appendChild(item);
-      if (!d.leido) batch.update(ref, { leido: true });
-    });
-
-    await batch.commit();
-  } catch(err) {
-    const isPerm = err.code === "permission-denied" || (err.message||"").toLowerCase().includes("permission");
-    if (listEl) {
-      if (isPerm) {
-        listEl.innerHTML =
-          '<div style="background:rgba(244,63,94,.07);border:1px solid rgba(244,63,94,.25);border-radius:10px;padding:.9rem 1rem;font-family:var(--fb);font-size:18px;line-height:1.7">' +
-          '<div style="color:var(--red);font-weight:900;font-size:17px;letter-spacing:.1em;text-transform:uppercase;margin-bottom:.4rem">⚠ Regla de Firestore faltante</div>' +
-          '<div style="color:var(--muted);margin-bottom:.6rem">Agregá esta regla en <strong style="color:var(--text)">Firebase Console → Firestore → Reglas</strong>:</div>' +
-          '<code style="display:block;background:var(--bg);color:#6ee7b7;padding:.6rem .75rem;border-radius:7px;font-size:17px;white-space:pre;overflow-x:auto">match /fl_soporte/{docId} {\n  allow read, write: if request.auth != null;\n}</code>' +
-          '<button onclick="cargarMensajesSoporte()" style="margin-top:.6rem;width:100%;background:none;border:1px solid var(--border);color:var(--muted);font-family:var(--fb);font-size:17px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;padding:.45rem;border-radius:7px;cursor:pointer">↺ Reintentar</button>' +
-          '</div>';
-      } else {
-        listEl.innerHTML = '<p class="empty-msg" style="color:var(--red)">Error: ' + err.message + '</p>';
-      }
-    }
-    if (countEl) countEl.textContent = "";
-  }
-}
-
-async function marcarSoporteLeido(id, btnEl) {
-  try {
-    await db.collection("fl_soporte").doc(id).update({ leido: true });
-    const item = btnEl.closest(".adm-soporte-item");
-    if (item) item.classList.remove("unread");
-    btnEl.style.display = "none";
-  } catch(e) {}
-}
-
-
-function admEmailStaffBtn(btn) {
-  admEmailStaff(btn.getAttribute('data-email'), btn.getAttribute('data-nombre'), '');
-}
-function admEmailStaff(email, nombre, perfilJson) {
-  let perfil = {};
-  try { perfil = perfilJson ? JSON.parse(perfilJson) : {}; } catch(e) {}
-  const asunto = encodeURIComponent('Tu solicitud al staff de Fit Ladder');
-  const cuerpo = encodeURIComponent('Hola ' + nombre + ',\n\nRecibimos tu solicitud para unirte al staff de Fit Ladder.\n\n' + (perfil.especialidad ? 'Especialidad: ' + perfil.especialidad + '\n' : '') + (perfil.bio ? 'Bio: ' + perfil.bio + '\n' : '') + '\nEstamos revisando tu perfil. Te notificaremos a la brevedad.\n\n— Equipo Fit Ladder\nfitladder2026@gmail.com');
-  window.open('mailto:' + email + '?subject=' + asunto + '&body=' + cuerpo, '_blank');
-}
-
-function responderSoporte(uid, nombre, soporteId) {
-  abrirMsgModal(uid, nombre);
-  // Marcar el mensaje de soporte como leído al responder
-  db.collection("fl_soporte").doc(soporteId).update({ leido: true }).catch(()=>{});
-}
-
-// ══════════════════════════════════════════════
-//  INBOX USUARIOS
-// ══════════════════════════════════════════════
-let _inboxUnsubscribe = null;
-
-function cargarInbox() {
-  const user = auth.currentUser;
-  if (!user) return;
-
-  if (_inboxUnsubscribe) _inboxUnsubscribe();
-
-  _inboxUnsubscribe = db.collection("fl_inbox").doc(user.uid)
-    .collection("mensajes").orderBy("timestamp", "desc")
-    .onSnapshot(snap => {
-      const unread = snap.docs.filter(d => !d.data().leido).length;
-      const badge  = g("inbox-badge");
-      if (badge) {
-        badge.textContent    = unread;
-        badge.style.display  = unread > 0 ? "flex" : "none";
-      }
-    });
-}
-
-async function abrirInbox() {
-  const user = auth.currentUser;
-  if (!user) return;
-
-  g("inbox-modal").classList.remove("hidden");
-  const listEl = g("inbox-list");
-  listEl.innerHTML = `<div class="admin-loading"><div class="auth-spinner"></div>CARGANDO…</div>`;
-
-  try {
-    // Intentar con orderBy; si falla (índice faltante o timestamp null), recargar sin orden
-    let snap;
-    try {
-      snap = await db.collection("fl_inbox").doc(user.uid)
-        .collection("mensajes").orderBy("timestamp", "desc").get();
-    } catch(e) {
-      snap = await db.collection("fl_inbox").doc(user.uid)
-        .collection("mensajes").get();
-    }
-
-    listEl.innerHTML = "";
-
-    if (snap.empty) {
-      listEl.innerHTML = `<div class="inbox-empty">No tenés mensajes aún.<br><span style="font-size:17px">Cuando el equipo de soporte te envíe un mensaje, aparecerá aquí.</span></div>`;
-    } else {
-      // Ordenar manualmente por timestamp para evitar fallo si alguno es null
-      const docs = [];
-      snap.forEach(doc => docs.push({ ref: doc.ref, data: doc.data() }));
-      docs.sort((a,b) => {
-        const ta = a.data.timestamp?.toMillis?.() || 0;
-        const tb = b.data.timestamp?.toMillis?.() || 0;
-        return tb - ta;
-      });
-
-      const batch = db.batch();
-      docs.forEach(({ ref, data: d }) => {
-        const ts   = d.timestamp?.toMillis?.() || Date.now();
-        const item = document.createElement("div");
-        item.className = "inbox-msg-item" + (d.leido ? "" : " unread");
-        item.innerHTML =
-          `<div class="inbox-msg-meta">
-            <div class="inbox-msg-from">
-              <svg width="10" height="10" viewBox="0 0 24 24" fill="currentColor"><path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4z"/></svg>
-              ${d.de || "Equipo de Soporte"}
-            </div>
-            <div class="inbox-msg-date">${formatFechaRelativa(ts)}</div>
-          </div>
-          <div class="inbox-msg-text">${d.texto || d.message || "(sin contenido)"}</div>`;
-        listEl.appendChild(item);
-        if (!d.leido) batch.update(ref, { leido: true });
-      });
-      await batch.commit();
-      const badge = g("inbox-badge");
-      if (badge) badge.style.display = "none";
-    }
-
-    // Botón escribir al soporte (siempre visible abajo)
-    const composeBtn = document.createElement("button");
-    composeBtn.className = "inbox-compose-btn";
-    composeBtn.innerHTML = `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg> Escribir al equipo de soporte`;
-    composeBtn.onclick = abrirModalSoporte;
-    listEl.appendChild(composeBtn);
-
-  } catch(err) {
-    listEl.innerHTML = `<div class="inbox-empty" style="color:var(--red)">Error al cargar mensajes: ${err.message}</div>`;
-  }
-}
-
-function cerrarInbox() {
-  g("inbox-modal").classList.add("hidden");
-}
-
-// Cerrar modales al tocar afuera
-g("msg-modal") && g("msg-modal").addEventListener("click", e => {
-  if (e.target === g("msg-modal")) cerrarMsgModal();
-});
-g("modal-feed-publicar") && g("modal-feed-publicar").addEventListener("click", e => {
-  if (e.target === g("modal-feed-publicar")) cerrarModalFeed();
-});
-g("modal-feed-comentarios") && g("modal-feed-comentarios").addEventListener("click", e => {
-  if (e.target === g("modal-feed-comentarios")) g("modal-feed-comentarios").classList.add("hidden");
-});
-g("inbox-modal") && g("inbox-modal").addEventListener("click", e => {
-  if (e.target === g("inbox-modal")) cerrarInbox();
-});
-g("soporte-modal") && g("soporte-modal").addEventListener("click", e => {
-  if (e.target === g("soporte-modal")) cerrarModalSoporte();
-});
-
-
-// ══════════════════════════════════════════════
-//  ADMIN — ELIMINAR USUARIO (Firestore)
-// ══════════════════════════════════════════════
-let _confirmCallback = null;
-
-function mostrarConfirm(title, msg, yesCb) {
-  g("confirm-title").textContent = title;
-  g("confirm-msg").innerHTML = msg;
-  _confirmCallback = yesCb;
-  g("confirm-modal").classList.remove("hidden");
-}
-function cerrarConfirm() {
-  g("confirm-modal").classList.add("hidden");
-  _confirmCallback = null;
-}
-function ejecutarConfirm() {
-  cerrarConfirm();
-  if (_confirmCallback) _confirmCallback();
-}
-
-// Eliminar un usuario individual
-// ══════════════════════════════════════════════
-//  SINCRONIZACIÓN RMs → MET WORKOUT
-//  Escribe los RMs en la Realtime DB de Met Workout
-//  bajo rm/{CÓDIGO_ALUMNO} para que Met Workout
-//  los use al calcular los pesos de la rutina
-// ══════════════════════════════════════════════
-const MW_RTDB_URL  = "https://met-revolution-box-default-rtdb.firebaseio.com";
-const SK_MW_CODE   = "fl_mw_code_v1"; // código de acceso del alumno en Met Workout
-
-function getMWCode() {
-  return localStorage.getItem(SK_MW_CODE) || "";
-}
-
-function setMWCode(code) {
-  localStorage.setItem(SK_MW_CODE, code.trim().toUpperCase());
-}
-
-// Escribe los RMs en Firebase de Met Workout
-async function pushRMsAMetWorkout(pr) {
-  const code = getMWCode();
-  if (!code || !pr) return;
-  try {
-    const payload = {
-      snatch:        pr.snatch        || 0,
-      cleanJerk:     pr.cleanJerk     || 0,
-      backSquat:     pr.backSquat     || 0,
-      frontSquat:    pr.frontSquat    || 0,
-      deadlift:      pr.deadlift      || 0,
-      bench:         pr.bench         || 0,
-      shoulderPress: pr.shoulderPress || 0,
-      actualizadoEn: Date.now(),
-      code,
-      origen: "fitladder"
-    };
-    await fetch(`${MW_RTDB_URL}/mrb/rm/${code}.json`, {
-      method:  "PUT",
-      headers: { "Content-Type": "application/json" },
-      body:    JSON.stringify(payload)
-    });
-  } catch(e) {}
-}
-
-// Mostrar modal para vincular código de Met Workout (solo si no está guardado)
-function pedirCodigoMW() {
-  const code = getMWCode();
-  if (code) return; // ya vinculado, no molestar
-
-  // Crear modal si no existe
-  if (document.getElementById("modal-mw-code")) return;
-
-  const overlay = document.createElement("div");
-  overlay.id        = "modal-mw-code";
-  overlay.className = "modal-overlay";
-  overlay.style.cssText = "position:fixed;inset:0;background:rgba(0,0,0,.8);z-index:9999;display:flex;align-items:center;justify-content:center;padding:1.5rem;backdrop-filter:blur(8px)";
-  overlay.innerHTML = `
-    <div class="modal-card" style="max-width:360px;">
-      <div class="modal-title" style="font-size:24px;margin-bottom:.5rem">
-        🔗 Vincular con Met Workout
-        <button class="modal-close" onclick="document.getElementById('modal-mw-code').remove()">✕</button>
-      </div>
-      <p class="modal-desc">¿Usás Met Workout BOX? Ingresá tu código de acceso para que tus RMs se sincronicen automáticamente y la app calcule tus pesos de entrenamiento.</p>
-      <input id="mw-code-inp" class="modal-inp"
-        style="min-height:unset;height:44px;text-transform:uppercase;letter-spacing:.15em;font-size:22px;font-weight:700;resize:none"
-        placeholder="Tu código (ej: JUAN01)"
-        maxlength="24"
-        oninput="this.value=this.value.toUpperCase()">
-      <div id="mw-code-err" style="display:none;font-size:17px;font-weight:700;color:var(--red);margin-top:-.4rem"></div>
-      <button class="btn-save" onclick="guardarCodigoMW()">🔗 VINCULAR</button>
-      <button onclick="document.getElementById('modal-mw-code').remove()"
-        style="width:100%;background:none;border:none;color:var(--muted);font-family:var(--fb);font-size:18px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;padding:.5rem;cursor:pointer;margin-top:-.4rem">
-        AHORA NO
-      </button>
-    </div>`;
-  document.body.appendChild(overlay);
-  setTimeout(() => document.getElementById("mw-code-inp")?.focus(), 200);
-}
-
-async function guardarCodigoMW() {
-  const inp  = document.getElementById("mw-code-inp");
-  const err  = document.getElementById("mw-code-err");
-  const code = (inp?.value || "").trim().toUpperCase();
-  if (!code) { err.textContent = "⚠ Ingresá tu código"; err.style.display="block"; return; }
-
-  setMWCode(code);
-  // Enviar los RMs actuales inmediatamente
-  const pr = loadPR();
-  await pushRMsAMetWorkout(pr);
-
-  document.getElementById("modal-mw-code")?.remove();
-  showToast(`✅ VINCULADO CON MET WORKOUT — CÓDIGO ${code}`);
-}
-
-
-// ══════════════════════════════════════════════
-const FL_MW_SECRET = "MRB_FITLADDER_SHARED_2024";
-
-function flChecksum(b64) {
-  const str = b64 + FL_MW_SECRET;
-  let h = 0;
-  for (let i = 0; i < str.length; i++) {
-    h = Math.imul(31, h) + str.charCodeAt(i) | 0;
-  }
-  return (h >>> 0).toString(16).padStart(8, "0").toUpperCase();
-}
-
-// Mapeo clave Met Workout → clave Fit Ladder (son iguales ✓)
-const FL_KEY_MAP = {
-  snatch:        "snatch",
-  cleanJerk:     "cleanJerk",
-  backSquat:     "backSquat",
-  frontSquat:    "frontSquat",
-  deadlift:      "deadlift",
-  bench:         "bench",
-  shoulderPress: "shoulderPress"
-};
-
-// ── Abrir / cerrar modal migración ──
-function abrirModalMigracion() {
-  // Limpiar estado
-  const inp = g("fl-import-inp"); if (inp) inp.value = "";
-  const err = g("fl-import-err"); if (err) err.style.display = "none";
-  const ew  = g("fl-export-wrap"); if (ew) ew.style.display = "none";
-  switchMgTab("importar");
-  g("modal-migracion").classList.remove("hidden");
-}
-function cerrarModalMigracion() {
-  g("modal-migracion").classList.add("hidden");
-}
-
-// ── Tabs del modal ──
-function switchMgTab(tab) {
-  const tabs   = { importar: g("mg-tab-importar"),  exportar: g("mg-tab-exportar")  };
-  const panels = { importar: g("mg-panel-importar"), exportar: g("mg-panel-exportar") };
-  Object.keys(tabs).forEach(t => {
-    const active = t === tab;
-    if (tabs[t]) {
-      tabs[t].style.background = active ? "var(--blue)" : "transparent";
-      tabs[t].style.color      = active ? "#fff"        : "var(--muted)";
-    }
-    if (panels[t]) panels[t].style.display = active ? "block" : "none";
-  });
-}
-
-// ── IMPORTAR: recibir código del BOX ──
-async function flImportarDatos() {
-  const errEl = g("fl-import-err");
-  const raw   = (g("fl-import-inp")?.value || "").trim();
-  errEl.style.display = "none";
-
-  if (!raw) { errEl.textContent = "⚠ Pegá un código primero."; errEl.style.display = "block"; return; }
-
-  try {
-    const partes = raw.split(".");
-    if (partes.length < 2) throw new Error("formato");
-    const cs  = partes.pop();
-    const b64 = partes.join(".");
-
-    if (flChecksum(b64) !== cs) throw new Error("checksum");
-
-    const json    = decodeURIComponent(escape(atob(b64)));
-    const payload = JSON.parse(json);
-
-    if (!payload.rms || typeof payload.rms !== "object") throw new Error("datos");
-
-    // Validar expiración (7 días)
-    if (Date.now() - payload.timestamp > 7 * 24 * 60 * 60 * 1000) {
-      errEl.textContent = "⏰ El código expiró. Generá uno nuevo en Met Workout BOX.";
-      errEl.style.display = "block";
-      return;
-    }
-
-    // Leer PR actual y fusionar (no sobreescribe si el valor entrante es 0)
-    const pr = loadPR();
-    Object.keys(FL_KEY_MAP).forEach(k => {
-      const v = payload.rms[k];
-      if (v && v > 0) pr[FL_KEY_MAP[k]] = v;
-    });
-
-    await savePR(pr);
-
-    // Registrar en historial por ejercicio también
-    const histPR = loadHistPR();
-    const hoy = new Date().toISOString().split("T")[0];
-    const tsNow = Date.now();
-    Object.keys(FL_KEY_MAP).forEach(k => {
-      const v = payload.rms[k];
-      if (!v || v <= 0) return;
-      const flKey = FL_KEY_MAP[k];
-      if (!histPR[flKey]) histPR[flKey] = [];
-      if (!histPR[flKey].find(r => r.ts === tsNow)) {
-        histPR[flKey].push({ val: v, fecha: hoy, ts: tsNow });
-        histPR[flKey].sort((a, b) => a.ts - b.ts);
-      }
-    });
-    await saveHistPR(histPR);
-
-    const cantidad = Object.keys(payload.rms).filter(k => payload.rms[k] > 0).length;
-    cerrarModalMigracion();
-    entrarApp();
-    showToast(`✅ ${cantidad} RM${cantidad !== 1 ? "s" : ""} IMPORTADOS DESDE EL BOX`);
-
-  } catch(e) {
-    errEl.textContent = "❌ Código inválido. Verificá que lo copiaste completo.";
-    errEl.style.display = "block";
-  }
-}
-
-// ── EXPORTAR: generar código para llevar al BOX ──
-function flGenerarCodigoBox() {
-  const pr = loadPR();
-  const rms = {};
-  Object.keys(FL_KEY_MAP).forEach(k => {
-    if (pr[k] && pr[k] > 0) rms[k] = pr[k];
-  });
-
-  if (!Object.keys(rms).length) {
-    showToast("⚠ No hay RMs guardados para exportar");
-    return;
-  }
-
-  const payload = {
-    rms,
-    origen:    "fitladder",
-    timestamp: Date.now()
-  };
-  const json   = JSON.stringify(payload);
-  const b64    = btoa(unescape(encodeURIComponent(json)));
-  const cs     = flChecksum(b64);
-  const codigo = b64 + "." + cs;
-
-  const wrap = g("fl-export-wrap");
-  const out  = g("fl-export-out");
-  if (out)  out.value = codigo;
-  if (wrap) { wrap.style.display = "block"; }
-  showToast("✅ CÓDIGO GENERADO");
-}
-
-function flCopiarCodigoBox() {
-  const out = g("fl-export-out");
-  if (!out || !out.value) return;
-  navigator.clipboard.writeText(out.value)
-    .then(() => {
-      showToast("📋 CÓDIGO COPIADO");
-      const btn = g("fl-export-copy-btn");
-      if (btn) { btn.textContent = "✅ COPIADO"; setTimeout(() => { btn.textContent = "📋 COPIAR CÓDIGO"; }, 2000); }
-    })
-    .catch(() => {
-      out.select(); document.execCommand("copy");
-      showToast("📋 CÓDIGO COPIADO");
-    });
-}
-
-// Cerrar modal al tocar el fondo
-document.getElementById("modal-migracion")?.addEventListener("click", function(e) {
-  if (e.target === this) cerrarModalMigracion();
-});
-
-
-/* ══════════════════════════════════════════════
-   MI PROFESOR — Vinculación alumno ↔ profesor
-══════════════════════════════════════════════ */
-
-/* ══════════════════════════════════════════════
-   SISTEMA PROFESORES / ALUMNOS
-   Firestore:
-     profesores_registrados/{slotId}  → { nombre, uid, habilitado, bio, especialidad, ig }
-     solicitudes_vinculacion/{id}     → { alumnoUid, alumnoNombre, alumnoEmail, profSlotId, estado, ts }
-     users/{uid}                      → { profesorId, vinculoEstado:'pendiente'|'vinculado', permisos:{rms,antro,peso,graficos} }
-══════════════════════════════════════════════ */
-
-const PERMISOS_DEF = [
-  { key:'rms',      label:'🏋️ RMs / Resultados' },
-  { key:'peso',     label:'⚖️ Peso corporal' },
-  { key:'antro',    label:'📏 Antropométricos' },
-  { key:'graficos', label:'📈 Gráficos de progreso' },
-  { key:'calorias', label:'🔥 Diario de calorías' },
-];
-
-/* ─────────────────────────────────────────
-   PANEL PROFESORES (vista alumno)
-───────────────────────────────────────── */
-async function renderPanelProfesores() {
-  const user = auth.currentUser;
-  if (!user) return;
-  const snap = await db.collection('users').doc(user.uid).get();
-  const ud   = snap.exists ? snap.data() : {};
-
-  // Si el usuario es profesor → redirigir a Mis Alumnos
-  if (ud.role === 'profesor') {
-    g('tab-misalumnos').style.display = 'block';
-    switchTab('misalumnos');
-    return;
-  }
-
-  const conexBlk  = g('prof-conexion-blk');
-  const conexWrap = g('prof-conexion-wrap');
-  const permBlk   = g('prof-permisos-blk');
-
-  if (ud.vinculoEstado === 'vinculado' && ud.profesorId) {
-    // ── VINCULADO: mostrar bloque de conexión + permisos ──
-    conexBlk.style.display = 'block';
-    permBlk.style.display  = 'block';
-    try {
-      const ps  = await db.collection('profesores_registrados').doc(ud.profesorId).get();
-      const p   = ps.exists ? ps.data() : {};
-      const ini = iniciales(p.nombre||'?');
-      conexWrap.innerHTML = `
-        <div style="display:flex;align-items:center;gap:.85rem;">
-          <div style="width:52px;height:52px;border-radius:50%;background:linear-gradient(135deg,var(--green),#059669);display:flex;align-items:center;justify-content:center;font-family:var(--fd);font-size:20px;color:#fff;flex-shrink:0;">${ini}</div>
-          <div style="flex:1;">
-            <div style="font-family:var(--fd);font-size:21px;color:var(--text);">${escHtml(p.nombre||'Profesor')}</div>
-            ${p.especialidad?'<div style="font-size:13px;color:var(--blue3);font-weight:700;">'+escHtml(p.especialidad)+'</div>':''}
-            <span class="prof-badge activo" style="margin-top:.25rem;display:inline-block;">✅ Vinculado</span>
-          </div>
-        </div>
-        <button onclick="alumnoDesvincular()" style="width:100%;margin-top:.5rem;background:none;border:1px solid var(--border);border-radius:9px;padding:.5rem;color:var(--muted);font-family:var(--fb);font-size:13px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;cursor:pointer;">
-          Desvincularme
-        </button>`;
-      renderPermisos(ud.permisos || {});
-    } catch(e) { conexWrap.innerHTML = '<p style="color:var(--muted)">Error al cargar.</p>'; }
-
-  } else if (ud.vinculoEstado === 'pendiente' && ud.profesorId) {
-    // ── PENDIENTE: mostrar bloque de conexión, sin permisos ──
-    conexBlk.style.display = 'block';
-    permBlk.style.display  = 'none';
-    try {
-      const ps = await db.collection('profesores_registrados').doc(ud.profesorId).get();
-      const p  = ps.exists ? ps.data() : {};
-      conexWrap.innerHTML = `
-        <div style="background:rgba(245,158,11,.08);border:1px solid rgba(245,158,11,.3);border-radius:12px;padding:.85rem 1rem;">
-          <div style="font-size:16px;font-weight:700;color:var(--yellow);margin-bottom:.3rem;">⏳ Solicitud enviada</div>
-          <div style="font-size:15px;color:var(--muted);">Esperando que <strong style="color:var(--text);">${escHtml(p.nombre||'el profesor')}</strong> acepte tu solicitud.</div>
-        </div>
-        <button onclick="alumnoRetirarSolicitud()" style="width:100%;margin-top:.4rem;background:none;border:1px solid var(--border);border-radius:9px;padding:.5rem;color:var(--muted);font-family:var(--fb);font-size:13px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;cursor:pointer;">
-          Retirar solicitud
-        </button>`;
-    } catch(e) { conexWrap.innerHTML = '<p style="color:var(--muted)">Error al cargar.</p>'; }
-
-  } else {
-    // ── SIN VÍNCULO: ocultar bloque de conexión ──
-    conexBlk.style.display = 'none';
-  }
-
-  // Siempre cargar la lista de profesores activos
-  await renderListaProfesores(user.uid, ud);
-}
-
-function renderPermisos(permsActuales) {
-  const lista = g('prof-permisos-list');
-  if (!lista) return;
-  lista.innerHTML = PERMISOS_DEF.map(p => {
-    const checked = permsActuales[p.key] !== false; // default true
-    return `<label style="display:flex;align-items:center;gap:.7rem;background:var(--bg4);border:1px solid var(--border);border-radius:10px;padding:.6rem .85rem;cursor:pointer;">
-      <input type="checkbox" id="perm-${p.key}" ${checked?'checked':''} style="width:18px;height:18px;accent-color:var(--blue);cursor:pointer;flex-shrink:0;">
-      <span style="font-size:16px;color:var(--text);font-family:var(--fb);font-weight:600;">${p.label}</span>
-    </label>`;
-  }).join('');
-}
-
-async function guardarPermisos() {
-  const user = auth.currentUser;
-  if (!user) return;
-  const permisos = {};
-  PERMISOS_DEF.forEach(p => { permisos[p.key] = g('perm-' + p.key)?.checked ?? true; });
-  try {
-    await db.collection('users').doc(user.uid).set({ permisos }, { merge: true });
-    showToast('✅ Permisos guardados');
-  } catch(e) { showToast('❌ Error: ' + e.message); }
-}
-
-async function renderListaProfesores(alumnoUid, ud) {
-  const lista = g('prof-lista');
-  if (!lista) return;
-  lista.innerHTML = '<div class="admin-loading"><div class="auth-spinner"></div>CARGANDO…</div>';
-  const vinculadoId = ud?.profesorId || null;
-  const vinculoEst  = ud?.vinculoEstado || null;
-  const espIconos = {
-    'Entrenador personal':'🏋️', 'Profesor de educación física':'🤸',
-    'Nutricionista':'🥗', 'CrossFit / Halterofilia':'💪', 'Yoga / Pilates':'🧘'
-  };
-  try {
-    const snap = await db.collection('profesores_registrados').where('habilitado','==',true).get();
-    const profs = [];
-    snap.forEach(doc => {
-      const d = doc.data();
-      if (d.uid && d.perfilEstado === 'activo') profs.push({ id: doc.id, ...d });
-    });
-    if (!profs.length) {
-      lista.innerHTML = '<p style="color:var(--muted);font-size:16px;text-align:center;padding:.5rem 0;">No hay profesores disponibles aún.</p>';
-      return;
-    }
-    lista.innerHTML = '';
-    profs.forEach(p => {
-      const ini       = iniciales(p.nombre||'?');
-      const esEste    = vinculadoId === p.id;
-      const vinculado = esEste && vinculoEst === 'vinculado';
-      const pendiente = esEste && vinculoEst === 'pendiente';
-      const espLabel  = p.especialidad || '';
-      const espIco    = espIconos[espLabel] || '👤';
-      const bdrColor  = vinculado ? 'rgba(16,185,129,.4)' : pendiente ? 'rgba(245,158,11,.35)' : 'var(--border)';
-      const avatarBg  = vinculado ? 'var(--green),#059669' : '#7c3aed,#a78bfa';
-
-      let btnHtml;
-      if (vinculado) {
-        btnHtml = '<button onclick="alumnoDesvincular()" style="width:100%;background:none;border:1px solid var(--border);border-radius:9px;padding:.5rem;color:var(--muted);font-family:var(--fb);font-size:13px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;cursor:pointer;">Desvincularme</button>';
-      } else if (pendiente) {
-        btnHtml = '<button onclick="alumnoRetirarSolicitud()" style="width:100%;background:none;border:1px solid rgba(245,158,11,.4);border-radius:9px;padding:.5rem;color:var(--yellow);font-family:var(--fb);font-size:13px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;cursor:pointer;">Retirar solicitud</button>';
-      } else if (vinculadoId) {
-        btnHtml = '<button disabled style="width:100%;background:var(--bg3);border:1px solid var(--border);border-radius:9px;padding:.5rem;color:var(--muted);font-family:var(--fb);font-size:13px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;opacity:.45;cursor:not-allowed;">Ya tenés un profesor</button>';
-      } else {
-        btnHtml = '<button data-pid="'+p.id+'" data-pnombre="'+escHtml(p.nombre||'')+'" data-uid="'+alumnoUid+'" onclick="alumnoEnviarSolicitudBtn(this)" style="width:100%;background:var(--blue);border:none;border-radius:9px;padding:.55rem;color:#fff;font-family:var(--fb);font-size:14px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;cursor:pointer;">SOLICITAR VINCULACIÓN</button>';
-      }
-
-      const card = document.createElement('div');
-      card.style.cssText = 'background:var(--bg4);border:1px solid '+bdrColor+';border-radius:14px;overflow:hidden;';
-      card.innerHTML =
-        '<div style="padding:.9rem 1rem;display:flex;align-items:center;gap:.85rem;">' +
-          '<div style="width:50px;height:50px;border-radius:50%;background:linear-gradient(135deg,'+avatarBg+');display:flex;align-items:center;justify-content:center;font-family:var(--fd);font-size:20px;color:#fff;flex-shrink:0;">' + ini + '</div>' +
-          '<div style="flex:1;min-width:0;">' +
-            '<div style="font-family:var(--fd);font-size:20px;color:var(--text);">' + escHtml(p.nombre||'Profesor') + '</div>' +
-            (espLabel ? '<div style="font-size:13px;color:var(--blue3);font-weight:700;margin-top:.1rem;">' + espIco + ' ' + escHtml(espLabel) + '</div>' : '') +
-            (p.ig ? '<div style="font-size:12px;color:var(--muted);">@' + escHtml(p.ig) + '</div>' : '') +
-          '</div>' +
-          (vinculado ? '<span class="prof-badge activo" style="flex-shrink:0;">✅ Mi profe</span>' : '') +
-          (pendiente ? '<span class="prof-badge pendiente" style="flex-shrink:0;">⏳ Pendiente</span>' : '') +
-        '</div>' +
-        (p.bio ? '<div style="font-size:15px;color:var(--muted);line-height:1.55;padding:0 1rem .8rem;">' + escHtml(p.bio) + '</div>' : '') +
-        '<div style="padding:.65rem 1rem;border-top:1px solid var(--border);">' + btnHtml + '</div>';
-      lista.appendChild(card);
-    });
-  } catch(e) {
-    lista.innerHTML = '<p style="color:var(--red);">Error: ' + e.message + '</p>';
-  }
-}
-
-function alumnoEnviarSolicitudBtn(btn) {
-  const pid     = btn.getAttribute('data-pid');
-  const pnombre = btn.getAttribute('data-pnombre');
-  const uid     = btn.getAttribute('data-uid');
-  alumnoEnviarSolicitud(pid, pnombre, uid);
-}
-
-async function alumnoEnviarSolicitud(profSlotId, profNombre) {
-  const user = auth.currentUser;
-  if (!user) return;
-  try {
-    const userDoc  = await db.collection('users').doc(user.uid).get();
-    const ud = userDoc.exists ? userDoc.data() : {};
-    await db.collection('solicitudes_vinculacion').add({
-      alumnoUid:    user.uid,
-      alumnoNombre: ud.name || ud.displayName || user.email,
-      alumnoEmail:  ud.email || user.email,
-      profSlotId,
-      estado:       'pendiente',
-      ts:           firebase.firestore.FieldValue.serverTimestamp()
-    });
-    // Permisos por defecto: todos activos
-    const permisosDefault = {};
-    PERMISOS_DEF.forEach(p => { permisosDefault[p.key] = true; });
-    await db.collection('users').doc(user.uid).set({
-      profesorId:    profSlotId,
-      vinculoEstado: 'pendiente',
-      permisos:      permisosDefault
-    }, { merge: true });
-    showToast('✅ Solicitud enviada a ' + profNombre);
-    renderPanelProfesores();
-  } catch(e) { showToast('❌ Error: ' + e.message); }
-}
-
-async function alumnoRetirarSolicitud() {
-  const user = auth.currentUser;
-  if (!user) return;
-  try {
-    const ud = (await db.collection('users').doc(user.uid).get()).data() || {};
-    if (ud.profesorId) {
-      const ss = await db.collection('solicitudes_vinculacion')
-        .where('alumnoUid','==',user.uid).where('profSlotId','==',ud.profesorId).where('estado','==','pendiente').get();
-      const b = db.batch(); ss.forEach(d=>b.delete(d.ref)); await b.commit();
-    }
-    await db.collection('users').doc(user.uid).update({
-      profesorId: firebase.firestore.FieldValue.delete(),
-      vinculoEstado: firebase.firestore.FieldValue.delete()
-    });
-    showToast('✅ Solicitud retirada');
-    renderPanelProfesores();
-  } catch(e) { showToast('❌ Error: ' + e.message); }
-}
-
-async function alumnoDesvincular() {
-  const user = auth.currentUser;
-  if (!user) return;
-  try {
-    const ud = (await db.collection('users').doc(user.uid).get()).data() || {};
-    if (ud.profesorId) {
-      const ss = await db.collection('solicitudes_vinculacion')
-        .where('alumnoUid','==',user.uid).where('profSlotId','==',ud.profesorId).get();
-      const b = db.batch(); ss.forEach(d=>b.delete(d.ref)); await b.commit();
-    }
-    await db.collection('users').doc(user.uid).update({
-      profesorId: firebase.firestore.FieldValue.delete(),
-      vinculoEstado: firebase.firestore.FieldValue.delete()
-    });
-    showToast('✅ Desvinculado');
-    renderPanelProfesores();
-  } catch(e) { showToast('❌ Error: ' + e.message); }
-}
-
-/* ─────────────────────────────────────────
-   PANEL MIS ALUMNOS (vista profesor)
-───────────────────────────────────────── */
-function buildPermisosHtml(perms) {
-  return PERMISOS_DEF.map(function(p) {
-    var ok = perms[p.key] !== false;
-    var bg  = ok ? 'rgba(16,185,129,.12)' : 'rgba(244,63,94,.08)';
-    var col = ok ? 'var(--green)' : 'rgba(244,63,94,.55)';
-    var bdr = ok ? 'rgba(16,185,129,.3)' : 'rgba(244,63,94,.2)';
-    return '<span style="font-size:11px;font-weight:700;padding:.18rem .5rem;border-radius:6px;background:' + bg + ';color:' + col + ';border:1px solid ' + bdr + ';">' + p.label + ' ' + (ok ? '✓' : '✗') + '</span>';
-  }).join(' ');
-}
-
-async function renderPanelMisAlumnos() {
-  const user = auth.currentUser;
-  if (!user) return;
-  const lista = g('mis-alumnos-list');
-  try {
-
-  // Cargar perfil del profesor — buscar por profSlotId primero, luego por uid
-  let slotDoc = null;
-  const myUserSnap = await db.collection('users').doc(user.uid).get();
-  const mySlotId   = myUserSnap.exists ? myUserSnap.data().profSlotId : null;
-  if (mySlotId) {
-    const direct = await db.collection('profesores_registrados').doc(mySlotId).get();
-    if (direct.exists) slotDoc = direct;
-  }
-  if (!slotDoc) {
-    const ss = await db.collection('profesores_registrados').where('uid','==',user.uid).get();
-    if (!ss.empty) slotDoc = ss.docs[0];
-  }
-  if (!slotDoc) {
-    lista.innerHTML = '<p style="color:var(--muted);">No se encontró tu perfil de profesor. Contactá al administrador.</p>';
-    return;
-  }
-  const slotId   = slotDoc.id;
-  let   slotData = slotDoc.data();
-
-  // Merge perfil from users/{uid}.perfilProfesor if more recent
-  try {
-    const ud = await db.collection('users').doc(user.uid).get();
-    const pp = ud.data()?.perfilProfesor;
-    if (pp) {
-      // users doc has the latest profile data (professor may have saved it there due to permissions)
-      slotData = { ...slotData, ...pp };
-      // Try to sync back to profesores_registrados if needed
-      if (pp.perfilEstado && pp.perfilEstado !== slotDoc.data().perfilEstado) {
-        try { await slotDoc.ref.update(pp); } catch(e) {}
-      }
-    }
-  } catch(e) {}
-
-  // Mostrar perfil
-  renderPerfilProfesorView(slotData);
-
-  // Notificaciones del admin (aprobación / rechazo)
-  try {
-    const notifSnap = await db.collection('users').doc(user.uid).collection('notificaciones')
-      .where('leido','==',false).orderBy('ts','desc').limit(5).get();
-    if (!notifSnap.empty) {
-      const wrap = g('perfil-prof-view');
-      if (wrap) {
-        let notifHtml = '';
-        notifSnap.forEach(n => {
-          const d = n.data();
-          const color = d.tipo==='perfil_aprobado' ? 'var(--green)' : 'var(--red)';
-          const bg    = d.tipo==='perfil_aprobado' ? 'rgba(16,185,129,.08)' : 'rgba(244,63,94,.08)';
-          const bdr   = d.tipo==='perfil_aprobado' ? 'rgba(16,185,129,.3)' : 'rgba(244,63,94,.3)';
-          notifHtml += '<div style="font-size:14px;color:'+color+';background:'+bg+';border:1px solid '+bdr+';border-radius:9px;padding:.55rem .8rem;line-height:1.5;display:flex;justify-content:space-between;align-items:flex-start;gap:.5rem;">'
-            + '<span>'+escHtml(d.mensaje||'')+'</span>'
-            + '<button data-nid="'+n.id+'" data-uid="'+user.uid+'" onclick="marcarNotifLeidaBtn(this)" style="background:none;border:none;color:'+color+';font-size:18px;cursor:pointer;flex-shrink:0;padding:0;">✕</button>'
-            + '</div>';
-        });
-        wrap.insertAdjacentHTML('afterbegin', notifHtml);
-      }
-    }
-  } catch(e) {}
-
-  // Solicitudes pendientes
-  const solSnap = await db.collection('solicitudes_vinculacion')
-    .where('profSlotId','==',slotId).where('estado','==','pendiente').get();
-  const blkSol  = g('mis-sol-blk');
-  const listSol = g('mis-sol-list');
-  if (!solSnap.empty) {
-    blkSol.style.display = 'block';
-    listSol.innerHTML = '';
-    solSnap.forEach(doc => {
-      const s = doc.data();
-      const ini = iniciales(s.alumnoNombre||'?');
-      const card = document.createElement('div');
-      card.id = 'sol-' + doc.id;
-      card.style.cssText = 'background:rgba(245,158,11,.07);border:1px solid rgba(245,158,11,.3);border-radius:12px;padding:.75rem .9rem;';
-      card.innerHTML = `
-        <div style="display:flex;align-items:center;gap:.7rem;margin-bottom:.55rem;">
-          <div style="width:38px;height:38px;border-radius:50%;background:linear-gradient(135deg,var(--yellow),#d97706);display:flex;align-items:center;justify-content:center;font-family:var(--fd);font-size:15px;color:#000;flex-shrink:0;">${ini}</div>
-          <div>
-            <div style="font-family:var(--fd);font-size:18px;color:var(--text);">${escHtml(s.alumnoNombre||'Alumno')}</div>
-            <div style="font-size:13px;color:var(--muted);">${escHtml(s.alumnoEmail||'')}</div>
-          </div>
-        </div>
-        <div style="display:flex;gap:.4rem;">
-          <button onclick="profAceptar('${doc.id}','${s.alumnoUid}','${slotId}')"
-            style="flex:1;background:var(--green);border:none;border-radius:9px;padding:.5rem;color:#fff;font-family:var(--fb);font-size:13px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;cursor:pointer;">✅ ACEPTAR</button>
-          <button onclick="profRechazar('${doc.id}','${s.alumnoUid}')"
-            style="flex:1;background:rgba(244,63,94,.15);border:1px solid rgba(244,63,94,.4);border-radius:9px;padding:.5rem;color:var(--red);font-family:var(--fb);font-size:13px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;cursor:pointer;">✕ RECHAZAR</button>
-        </div>`;
-      listSol.appendChild(card);
-    });
-  } else {
-    blkSol.style.display = 'none';
-  }
-
-  // Alumnos vinculados — leer desde array alumnos[] del doc del profesor
-  // (evita query sobre colección users que requiere permisos elevados)
-  const alumnosUids = slotData.alumnos || [];
-  if (alumnosUids.length === 0) {
-    lista.innerHTML = '<p style="color:var(--muted);font-size:16px;line-height:1.6;">No tenés alumnos vinculados aún.<br><span style="font-size:14px;">Cuando aceptés una solicitud, el alumno aparecerá aquí.</span></p>';
-    return;
-  }
-  lista.innerHTML = '';
-  // Leer cada alumno por su UID (read individual — permitido por reglas)
-  const alumSnaps = await Promise.all(alumnosUids.map(uid => db.collection('users').doc(uid).get()));
-  const alumDocs = alumSnaps.filter(s => s.exists && s.data().vinculoEstado === 'vinculado');
-  if (alumDocs.length === 0) {
-    lista.innerHTML = '<p style="color:var(--muted);font-size:16px;line-height:1.6;">No tenés alumnos vinculados aún.<br><span style="font-size:14px;">Cuando aceptés una solicitud, el alumno aparecerá aquí.</span></p>';
-    return;
-  }
-  alumDocs.forEach(doc => {
-    const d   = doc.data();
-    const nom = d.name || d.displayName || 'Sin nombre';
-    const ema = d.email || '—';
-    const ini = iniciales(nom);
-    const ts  = d.ultimaConexion?.toMillis?.() || 0;
-    const perms = d.permisos || {};
-    const card = document.createElement('div');
-    card.style.cssText = 'background:var(--bg4);border:1px solid var(--border);border-radius:12px;padding:.75rem .9rem;display:flex;flex-direction:column;gap:.45rem;';
-    card.innerHTML = `
-      <div style="display:flex;align-items:center;gap:.7rem;">
-        <div style="width:40px;height:40px;border-radius:50%;background:linear-gradient(135deg,var(--blue),var(--blue2));display:flex;align-items:center;justify-content:center;font-family:var(--fd);font-size:17px;color:#fff;flex-shrink:0;">${ini}</div>
-        <div style="flex:1;min-width:0;">
-          <div style="font-family:var(--fd);font-size:18px;color:var(--text);">${escHtml(nom)}</div>
-          <div style="font-size:13px;color:var(--muted);">${escHtml(ema)}</div>
-        </div>
-        <div style="font-size:12px;color:var(--muted);flex-shrink:0;">${ts?formatFechaRelativa(ts):''}</div>
-      </div>
-      <div style="display:flex;gap:.4rem;">
-        <button onclick="verDatosAlumno('${doc.id}','${escHtml(nom).replace(/'/g,"\'")}','${doc.id}')"
-          style="flex:1;background:rgba(37,99,235,.12);border:1px solid rgba(37,99,235,.3);border-radius:9px;padding:.45rem;color:var(--blue3);font-family:var(--fb);font-size:13px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;cursor:pointer;">📊 VER PROGRESO</button>
-        <button onclick="profDesvincular('${doc.id}','${slotId}','${escHtml(nom).replace(/'/g,"\'")}')"
-          style="background:rgba(244,63,94,.1);border:1px solid rgba(244,63,94,.3);border-radius:9px;padding:.45rem .65rem;color:var(--red);font-family:var(--fb);font-size:12px;font-weight:700;cursor:pointer;flex-shrink:0;">Desvincular</button>
-      </div>
-      <div style="display:flex;flex-wrap:wrap;gap:.3rem;margin-top:.15rem;">${buildPermisosHtml(perms)}</div>`;
-    lista.appendChild(card);
-  });
-
-  } catch(e) {
-    console.error('renderPanelMisAlumnos error:', e);
-    if (lista) lista.innerHTML = '<p style="color:var(--red);font-size:15px;padding:.5rem;">⚠️ Error al cargar: ' + e.message + '</p>';
-  }
-}
-
-function estadoBadge(estado) {
-  const cfg = {
-    incompleto: { color:'var(--muted)',   bg:'rgba(74,85,104,.15)',  border:'rgba(74,85,104,.3)',  icon:'🟡', txt:'Incompleto — cargá tu descripción para enviarlo a revisión' },
-    pendiente:  { color:'var(--blue3)',   bg:'rgba(37,99,235,.1)',   border:'rgba(37,99,235,.3)',  icon:'🔵', txt:'Pendiente — en revisión por el administrador' },
-    activo:     { color:'var(--green)',   bg:'rgba(16,185,129,.1)',  border:'rgba(16,185,129,.3)', icon:'✅', txt:'Activo — aparecés en la lista de alumnos' },
-    rechazado:  { color:'var(--red)',     bg:'rgba(244,63,94,.1)',   border:'rgba(244,63,94,.3)',  icon:'❌', txt:'Rechazado por el administrador' },
-    revision:   { color:'var(--yellow)',  bg:'rgba(245,158,11,.1)',  border:'rgba(245,158,11,.3)', icon:'🔄', txt:'En revisión — editaste tu perfil, esperando aprobación' },
-  };
-  return cfg[estado] || cfg.incompleto;
-}
-
-function renderPerfilProfesorView(d) {
-  const el = g('perfil-prof-view');
-  if (!el) return;
-  const ini    = iniciales(d.nombre||'?');
-  const estado = d.perfilEstado || (d.bio && d.bio.trim() ? 'pendiente' : 'incompleto');
-  const badge  = estadoBadge(estado);
-  el.innerHTML = `
-    <div style="display:flex;align-items:center;gap:.85rem;">
-      <div style="width:52px;height:52px;border-radius:50%;background:linear-gradient(135deg,#7c3aed,#a78bfa);display:flex;align-items:center;justify-content:center;font-family:var(--fd);font-size:21px;color:#fff;flex-shrink:0;">${ini}</div>
-      <div>
-        <div style="font-family:var(--fd);font-size:21px;color:var(--text);">${escHtml(d.nombre||'Sin nombre')}</div>
-        ${d.especialidad?'<div style="font-size:13px;color:var(--blue3);font-weight:700;">'+escHtml(d.especialidad)+'</div>':''}
-        ${d.ig?'<div style="font-size:12px;color:var(--muted);">@'+escHtml(d.ig)+'</div>':''}
-      </div>
-    </div>
-    ${d.bio?'<div style="font-size:15px;color:var(--muted);line-height:1.55;background:var(--bg4);border-radius:10px;padding:.65rem .85rem;">'+escHtml(d.bio)+'</div>':''}
-    <div style="display:flex;align-items:center;gap:.5rem;padding:.55rem .8rem;background:${badge.bg};border:1px solid ${badge.border};border-radius:9px;">
-      <span style="font-size:16px;">${badge.icon}</span>
-      <span style="font-size:14px;color:${badge.color};font-weight:700;line-height:1.4;">${badge.txt}</span>
-    </div>
-    ${estado==='rechazado' && d.motivoRechazo ? '<div style="font-size:14px;color:var(--muted);background:var(--bg4);border-radius:9px;padding:.55rem .8rem;line-height:1.5;"><strong style="color:var(--red)">Motivo:</strong> '+escHtml(d.motivoRechazo)+'</div>' : ''}`;
-  // Pre-fill edit form
-  if(g('perfil-nombre-inp'))       g('perfil-nombre-inp').value       = d.nombre||'';
-  if(g('perfil-bio-inp'))          g('perfil-bio-inp').value          = d.bio||'';
-  const espInp = g('perfil-especialidad-inp');
-  const espOtro = g('perfil-especialidad-otro');
-  if (espInp) {
-    const opts = ['Entrenador personal','Profesor de educación física','Nutricionista','CrossFit / Halterofilia','Yoga / Pilates'];
-    if (opts.includes(d.especialidad||'')) {
-      espInp.value = d.especialidad||'';
-      if (espOtro) espOtro.style.display = 'none';
-    } else if (d.especialidad) {
-      espInp.value = 'Otro';
-      if (espOtro) { espOtro.style.display = 'block'; espOtro.value = d.especialidad; }
-    }
-  }
-  if(g('perfil-ig-inp'))           g('perfil-ig-inp').value           = d.ig||'';
-}
-
-// Show/hide "Otro" field in especialidad selector
-document.addEventListener('change', function(e) {
-  if (e.target && e.target.id === 'perfil-especialidad-inp') {
-    const otro = g('perfil-especialidad-otro');
-    if (otro) otro.style.display = e.target.value === 'Otro' ? 'block' : 'none';
-  }
-});
-
-function toggleEditarPerfil() {
-  const edit = g('perfil-prof-edit');
-  const btn  = g('btn-editar-perfil');
-  if (!edit) return;
-  const abriendo = edit.style.display === 'none' || edit.style.display === '';
-  edit.style.display = abriendo ? 'flex' : 'none';
-  btn.textContent = abriendo ? '✕ Cerrar' : '✏️ Editar';
-}
-
-async function guardarPerfilProfesor() {
-  const user = auth.currentUser;
-  if (!user) return;
-  const nombre       = g('perfil-nombre-inp')?.value.trim() || '';
-  const bio          = g('perfil-bio-inp')?.value.trim() || '';
-  const espSel = g('perfil-especialidad-inp')?.value || '';
-  const especialidad = espSel === 'Otro' ? (g('perfil-especialidad-otro')?.value.trim() || '') : espSel;
-  const ig           = g('perfil-ig-inp')?.value.trim().replace('@','') || '';
-  const msgEl        = g('perfil-save-msg');
-  if (!nombre) { if(msgEl){msgEl.textContent='⚠ Ingresá tu nombre';msgEl.style.color='var(--red)';} return; }
-  if (!bio)    { if(msgEl){msgEl.textContent='⚠ La descripción es obligatoria';msgEl.style.color='var(--red)';} return; }
-  try {
-    // Buscar por profSlotId (guardado en users doc al crear cuenta) — más directo y sin latencia de índice
-    let slotDoc = null;
-    const userSnap = await db.collection('users').doc(user.uid).get();
-    const profSlotId = userSnap.exists ? userSnap.data().profSlotId : null;
-    if (profSlotId) {
-      const direct = await db.collection('profesores_registrados').doc(profSlotId).get();
-      if (direct.exists) slotDoc = direct;
-    }
-    // Fallback: buscar por uid en caso de que profSlotId no esté
-    if (!slotDoc) {
-      const ss = await db.collection('profesores_registrados').where('uid','==',user.uid).get();
-      if (!ss.empty) slotDoc = ss.docs[0];
-    }
-    if (!slotDoc) { if(msgEl){msgEl.textContent='❌ No se encontró tu perfil. Contactá al administrador.';msgEl.style.color='var(--red)';} return; }
-    const prevData = slotDoc.data();
-    const eraActivo = prevData.perfilEstado === 'activo';
-    // Nuevo estado: si estaba activo → revisión, si no → pendiente
-    const nuevoEstado = eraActivo ? 'revision' : 'pendiente';
-    // Guardar perfil en users/{uid} (el profesor siempre tiene permisos aquí)
-    // y también intentar actualizar profesores_registrados si las reglas lo permiten
-    const perfilData = { nombre, bio, especialidad, ig, perfilEstado: nuevoEstado };
-    await db.collection('users').doc(user.uid).set({
-      perfilProfesor: perfilData,
-      perfilEstadoProf: nuevoEstado
-    }, { merge: true });
-
-    // Intentar actualizar profesores_registrados (requiere regla de Firestore)
-    try {
-      await slotDoc.ref.update({ nombre, bio, especialidad, ig, perfilEstado: nuevoEstado, motivoRechazo: firebase.firestore.FieldValue.delete() });
-    } catch(permErr) {
-      // Si no hay permisos directos, el admin lo puede sincronizar
-      // Los datos ya están en users/{uid}.perfilProfesor
-    }
-
-    // Notificar al admin en fl_soporte (colección que el profesor sí puede escribir)
-    const tipoNotif = eraActivo ? 'perfil_editado' : 'perfil_nuevo';
-    const msgNotif  = eraActivo
-      ? 'El profesor ' + nombre + ' modificó su perfil (estaba activo).'
-      : 'El profesor ' + nombre + ' completó su perfil por primera vez.';
-    try {
-      await db.collection('notificaciones_admin').add({
-        tipo:    tipoNotif,
-        profId:  slotDoc.id,
-        nombre,
-        mensaje: msgNotif,
-        leido:   false,
-        ts:      firebase.firestore.FieldValue.serverTimestamp()
-      });
-    } catch(e2) {
-      // Guardar la notificación en users/{uid} como fallback
-      await db.collection('users').doc(user.uid).set({
-        pendingNotifAdmin: { tipo: tipoNotif, mensaje: msgNotif, ts: new Date().toISOString() }
-      }, { merge: true });
-    }
-    if(msgEl){msgEl.textContent='✅ Perfil enviado a revisión. Te avisaremos por correo cuando el admin lo revise.';msgEl.style.color='var(--green)';}
-    setTimeout(()=>{ if(msgEl)msgEl.textContent=''; }, 5000);
-    renderPerfilProfesorView({ nombre, bio, especialidad, ig, perfilEstado: nuevoEstado });
-    toggleEditarPerfil();
-  } catch(e) {
-    if(msgEl){
-      if(e.message && e.message.includes('permission')) {
-        msgEl.innerHTML = '✅ Perfil guardado. El admin lo revisará pronto.<br><small style="color:var(--muted);">Nota: actualizá las reglas de Firestore para <code>profesores_registrados</code> si querés sincronización directa.</small>';
-        msgEl.style.color = 'var(--green)';
-        // Profile was saved to users doc so it's not lost
-        renderPerfilProfesorView({ nombre, bio, especialidad, ig, perfilEstado: nuevoEstado });
-        toggleEditarPerfil();
-      } else {
-        msgEl.textContent = '❌ Error: ' + e.message;
-        msgEl.style.color = 'var(--red)';
-      }
-    }
-  }
-}
-
-async function profAceptar(solId, alumnoUid, slotId) {
-  try {
-    const b = db.batch();
-    b.update(db.collection('solicitudes_vinculacion').doc(solId), { estado:'aceptada' });
-    b.set(db.collection('users').doc(alumnoUid), { profesorId:slotId, vinculoEstado:'vinculado' }, { merge:true });
-    // Guardar UID del alumno en el doc del profesor para evitar query sobre users[]
-    b.update(db.collection('profesores_registrados').doc(slotId), {
-      alumnos: firebase.firestore.FieldValue.arrayUnion(alumnoUid)
-    });
-    await b.commit();
-    showToast('✅ Alumno vinculado');
-    const el = g('sol-' + solId); if(el) el.remove();
-    renderPanelMisAlumnos();
-  } catch(e) { showToast('❌ Error: ' + e.message); }
-}
-
-async function profRechazar(solId, alumnoUid) {
-  try {
-    const b = db.batch();
-    b.update(db.collection('solicitudes_vinculacion').doc(solId), { estado:'rechazada' });
-    b.update(db.collection('users').doc(alumnoUid), {
-      profesorId: firebase.firestore.FieldValue.delete(),
-      vinculoEstado: firebase.firestore.FieldValue.delete()
-    });
-    await b.commit();
-    showToast('✅ Solicitud rechazada');
-    const el = g('sol-' + solId); if(el) el.remove();
-  } catch(e) { showToast('❌ Error: ' + e.message); }
-}
-
-async function profDesvincular(alumnoUid, slotId, nombre) {
-  try {
-    const ss = await db.collection('solicitudes_vinculacion')
-      .where('alumnoUid','==',alumnoUid).where('profSlotId','==',slotId).get();
-    const b = db.batch();
-    ss.forEach(d=>b.delete(d.ref));
-    b.update(db.collection('users').doc(alumnoUid), {
-      profesorId: firebase.firestore.FieldValue.delete(),
-      vinculoEstado: firebase.firestore.FieldValue.delete()
-    });
-    // Quitar UID del array del profesor
-    b.update(db.collection('profesores_registrados').doc(slotId), {
-      alumnos: firebase.firestore.FieldValue.arrayRemove(alumnoUid)
-    });
-    await b.commit();
-    showToast('✅ ' + nombre + ' desvinculado');
-    renderPanelMisAlumnos();
-  } catch(e) { showToast('❌ Error: ' + e.message); }
-}
-
-async function verDatosAlumno(uid, nombre) {
-  try {
-    const userDoc = await db.collection('users').doc(uid).get();
-    const d  = userDoc.exists ? userDoc.data() : {};
-    const pr = d.pr || {};
-    const perms = d.permisos || {};
-    // Respetar permisos del alumno
-    let secciones = '';
-
-    if (perms.peso !== false) {
-      let ultimoPeso = '—';
-      try {
-        const ps = await db.collection('users').doc(uid).collection('pesoCorporal').orderBy('fecha','desc').limit(1).get();
-        if (!ps.empty) ultimoPeso = ps.docs[0].data().peso + ' kg';
-      } catch(e) {}
-      secciones += `<div style="background:var(--bg4);border-radius:10px;padding:.7rem .9rem;">
-        <div style="font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-bottom:.35rem;">⚖️ Peso corporal</div>
-        <div style="font-family:var(--fd);font-size:28px;color:var(--blue3);">${ultimoPeso}</div>
-      </div>`;
-    }
-
-    if (perms.rms !== false) {
-      const campos = [
-        ['🏋️ Snatch',pr.snatch],['🏋️ C&J',pr.cleanJerk],['🦵 Back Squat',pr.backSquat],
-        ['🦵 Front Squat',pr.frontSquat],['💀 Deadlift',pr.deadlift],['🏅 Bench',pr.bench],['💪 Press',pr.shoulderPress]
-      ];
-      const filas = campos.filter(([,v])=>v).map(([l,v])=>
-        `<div style="display:flex;justify-content:space-between;padding:.3rem 0;border-bottom:1px solid var(--border);font-size:15px;">
-          <span style="color:var(--muted);">${l}</span><span style="font-weight:700;color:var(--text);">${v} kg</span>
-        </div>`).join('');
-      secciones += `<div style="background:var(--bg4);border-radius:10px;padding:.7rem .9rem;">
-        <div style="font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-bottom:.35rem;">🏆 Récords personales</div>
-        ${filas||'<p style="color:var(--muted);font-size:14px;">Sin datos.</p>'}
-      </div>`;
-    }
-
-    const noPermitidos = PERMISOS_DEF.filter(p => perms[p.key] === false).map(p=>p.label);
-    if (noPermitidos.length) {
-      secciones += `<div style="font-size:13px;color:var(--muted);background:var(--bg4);border-radius:9px;padding:.55rem .8rem;line-height:1.5;">
-        🔒 El alumno no habilitó: ${noPermitidos.join(', ')}
-      </div>`;
-    }
-
-    if (!secciones) secciones = '<p style="color:var(--muted);font-size:15px;">Este alumno no habilitó ningún dato.</p>';
-
-    const overlay = document.createElement('div');
-    overlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,.85);z-index:9999;display:flex;align-items:center;justify-content:center;padding:1.5rem;backdrop-filter:blur(8px);';
-    overlay.innerHTML = `
-      <div style="background:var(--bg2);border:1px solid var(--border);border-radius:14px;padding:1.4rem;width:100%;max-width:400px;display:flex;flex-direction:column;gap:.75rem;max-height:87vh;overflow-y:auto;">
-        <div style="display:flex;align-items:center;justify-content:space-between;">
-          <div style="font-family:var(--fd);font-size:22px;letter-spacing:1px;">📊 ${escHtml(nombre)}</div>
-          <button onclick="this.closest('[style*=fixed]').remove()" style="background:none;border:none;color:var(--muted);font-size:22px;cursor:pointer;">✕</button>
-        </div>
-        ${secciones}
-      </div>`;
-    overlay.addEventListener('click', e=>{ if(e.target===overlay) overlay.remove(); });
-    document.body.appendChild(overlay);
-  } catch(e) { showToast('❌ Error al cargar datos'); }
-}
-
-// Helper
-function iniciales(nombre) {
-  return (nombre||'?').trim().split(' ').filter(Boolean).slice(0,2).map(p=>p[0]).join('').toUpperCase();
-}
-
-
-async function abrirModalMasivo() {
-  const modal = g('masivo-modal');
-  const destEl = g('masivo-destinatarios');
-  const countEl = g('masivo-count-label');
-  if (!modal) return;
-  g('masivo-textarea').value = '';
-  destEl.textContent = 'Cargando…';
-  modal.classList.remove('hidden');
-  try {
-    const snap = await db.collection('users').get();
-    const emails = [];
-    snap.forEach(doc => {
-      const e = doc.data().email;
-      if (e) emails.push(e);
-    });
-    if (emails.length === 0) {
-      destEl.textContent = 'No hay usuarios con correo registrado.';
-      countEl.textContent = '';
-    } else {
-      destEl.textContent = emails.join(', ');
-      countEl.textContent = emails.length + ' destinatario' + (emails.length !== 1 ? 's' : '');
-      modal._emails = emails;
-    }
-  } catch(e) {
-    destEl.textContent = 'Error al cargar usuarios.';
-  }
-}
-
-function cerrarModalMasivo() {
-  const modal = g('masivo-modal');
-  if (modal) modal.classList.add('hidden');
-}
-
-function enviarMasivo() {
-  const modal = g('masivo-modal');
-  const emails = modal?._emails || [];
-  const cuerpo = g('masivo-textarea')?.value.trim() || '';
-  if (emails.length === 0) { showToast('⚠ No hay destinatarios'); return; }
-  if (!cuerpo) { showToast('⚠ Escribí el mensaje antes de enviar'); return; }
-  const bcc = emails.join(',');
-  const url = 'mailto:?bcc=' + encodeURIComponent(bcc)
-    + '&from=' + encodeURIComponent('fitladder2026@gmail.com')
-    + '&subject=' + encodeURIComponent('Fit Ladder')
-    + '&body=' + encodeURIComponent(cuerpo + '\n\n— Equipo Fit Ladder\nfitladder2026@gmail.com');
-  window.open(url, '_blank');
-}
-
-g('masivo-modal')?.addEventListener('click', e => {
-  if (e.target === g('masivo-modal')) cerrarModalMasivo();
-});
-
-
-async function admDesvincularAlumno(alumnoUid, nombre, profSlotId) {
-  try {
-    const userDoc    = await db.collection('users').doc(alumnoUid).get();
-    profSlotId = userDoc.data()?.profesorId;
-    const batch = db.batch();
-    if (profSlotId) {
-      const solSnap = await db.collection('solicitudes_vinculacion')
-        .where('alumnoUid','==',alumnoUid).where('profSlotId','==',profSlotId).get();
-      solSnap.forEach(d => batch.delete(d.ref));
-    }
-    batch.update(db.collection('users').doc(alumnoUid), {
-      profesorId:    firebase.firestore.FieldValue.delete(),
-      vinculoEstado: firebase.firestore.FieldValue.delete()
-    });
-    await batch.commit();
-    showToast('✅ ' + nombre + ' desvinculado');
-    cargarUsuariosAdmin();
-  } catch(e) { showToast('❌ Error: ' + e.message); }
-}
-
-function admMarcarBienvenida(uid) {
-  try {
-    let ws = new Set();
-    const stored = localStorage.getItem('fl_welcome_sent');
-    if (stored) ws = new Set(JSON.parse(stored));
-    ws.add(uid);
-    localStorage.setItem('fl_welcome_sent', JSON.stringify([...ws]));
-    setTimeout(() => {
-      const row = g('email-row-' + uid);
-      if (row && !row.textContent.trimStart().startsWith('✅')) {
-        row.innerHTML = '✅ ' + row.innerHTML;
-      }
-    }, 400);
-  } catch(e) {}
-}
-
-function pedirEliminarUsuario(uid, nombre, btnEl) {
-  mostrarConfirm(
-    "ELIMINAR CUENTA",
-    `¿Eliminar los datos de <strong>${nombre}</strong> de Firestore?<br><br>
-    <span style="color:var(--red);font-size:17px;font-weight:700">Esta acción no se puede deshacer.</span>`,
-    () => eliminarUsuarioFirestore(uid, nombre, btnEl)
-  );
-}
-
-async function eliminarUsuarioFirestore(uid, nombre, btnEl) {
-  if (btnEl) { btnEl.style.opacity = ".4"; btnEl.style.pointerEvents = "none"; }
-  try {
-    // Borrar subcol mensajes inbox
-    const msgsSnap = await db.collection("fl_inbox").doc(uid).collection("mensajes").get();
-    const batch = db.batch();
-    msgsSnap.forEach(doc => batch.delete(doc.ref));
-    // Borrar doc inbox raíz
-    batch.delete(db.collection("fl_inbox").doc(uid));
-    // Borrar doc usuario
-    batch.delete(db.collection("users").doc(uid));
-    await batch.commit();
-
-    showToast("🗑 " + nombre.toUpperCase() + " ELIMINADO");
-    // Recargar todo el panel desde Firestore para tener contadores exactos
-    setTimeout(() => cargarUsuariosAdmin(), 400);
-  } catch(err) {
-    if (btnEl) { btnEl.style.opacity = "1"; btnEl.style.pointerEvents = "all"; }
-    showToast("❌ Error: " + err.message);
-  }
-}
-
-// ── Limpiar cuentas huérfanas (en Firestore pero no en Auth) ──
 // ══════════════════════════════════════════════
 //  ADMIN — ASIGNAR NÚMEROS DE INSIGNIA RETROACTIVOS
 // ══════════════════════════════════════════════
@@ -13236,7 +11603,6 @@ function calAbrirModal(meal) { calToggleInline(meal); }
 function calCerrarModal() { ['desayuno','almuerzo','cena','snack'].forEach(calCerrarInline); }
 
 
-
 function calSetFreqTipo(tipo, btn) {
   _calFreqTipo = tipo;
   _calFreqDias = new Set();
@@ -13647,571 +12013,13 @@ function calCerrarModal() {
   });
 }
 
-/* ══════════════════════════════════════════════════════════════
-   SISTEMA DE PROFESORES REGISTRADOS
-   Firestore: profesores_registrados/{id}
-══════════════════════════════════════════════════════════════ */
-
-
-/* ── Admin: ciclo de vida de perfiles de profesor ── */
-
-
-function marcarNotifLeidaBtn(btn) {
-  marcarNotifLeida(btn.getAttribute('data-nid'), btn.getAttribute('data-uid'));
-}
-
-async function marcarNotifLeida(notifId, uid) {
-  try {
-    await db.collection('users').doc(uid).collection('notificaciones').doc(notifId).update({ leido: true });
-    const el = document.querySelector('[onclick*="'+notifId+'"]')?.closest('[style*="border-radius:9px"]');
-    if (el) el.remove();
-  } catch(e) {}
-}
-
-async function cargarPerfilesPendientes() {
-  const listEl  = g('adm-perfiles-list');
-  const hdrEl   = g('adm-perfiles-hdr');
-  const countEl = g('adm-perfiles-count');
-  if (!listEl) return;
-  try {
-    const snap = await db.collection('profesores_registrados')
-      .where('perfilEstado', 'in', ['pendiente','revision']).get();
-    if (snap.empty) {
-      listEl.innerHTML = '';
-      if (hdrEl) hdrEl.style.display = 'none';
-      return;
-    }
-    if (hdrEl) hdrEl.style.display = 'flex';
-    if (countEl) countEl.textContent = snap.size + ' pendiente' + (snap.size !== 1 ? 's' : '');
-    listEl.innerHTML = '';
-    snap.forEach(doc => {
-      const d   = doc.data();
-      const ini = (d.nombre||'?').trim().split(' ').slice(0,2).map(p=>p[0]).join('').toUpperCase();
-      const esRevision = d.perfilEstado === 'revision';
-      const card = document.createElement('div');
-      card.id = 'perfil-pend-' + doc.id;
-      card.style.cssText = 'background:'+(esRevision?'rgba(245,158,11,.07)':'rgba(37,99,235,.07)')+';border:1px solid '+(esRevision?'rgba(245,158,11,.35)':'rgba(37,99,235,.3)')+';border-radius:12px;padding:.75rem .9rem;display:flex;flex-direction:column;gap:.45rem;';
-      card.innerHTML =
-        '<div style="display:flex;align-items:center;gap:.7rem;">' +
-          '<div style="width:38px;height:38px;border-radius:50%;background:linear-gradient(135deg,#7c3aed,#a78bfa);display:flex;align-items:center;justify-content:center;font-family:var(--fd);font-size:15px;color:#fff;flex-shrink:0;">'+ini+'</div>' +
-          '<div style="flex:1;">' +
-            '<div style="font-family:var(--fd);font-size:17px;color:var(--text);">'+escHtml(d.nombre||'Profesor')+'</div>' +
-            '<div style="font-size:12px;color:'+(esRevision?'var(--yellow)':'var(--blue3)')+';font-weight:700;">'+(esRevision?'🔄 Modificó su perfil activo':'🔵 Nuevo perfil — primera vez')+'</div>' +
-          '</div>' +
-        '</div>' +
-        (d.especialidad?'<div style="font-size:13px;color:var(--blue3);font-weight:700;">'+escHtml(d.especialidad)+'</div>':'') +
-        (d.bio?'<div style="font-size:13px;color:var(--muted);background:var(--bg3);border-radius:8px;padding:.45rem .65rem;line-height:1.5;"><em>'+escHtml(d.bio)+'</em></div>':'') +
-        '<div style="display:flex;gap:.4rem;">' +
-          '<button data-sid="'+doc.id+'" data-nombre="'+escHtml(d.nombre||'')+'" data-email="'+escHtml(d.email||'')+'" data-uid="'+escHtml(d.uid||'')+'" onclick="admAprobarPerfilBtn(this)" style="flex:1;background:var(--green);border:none;border-radius:9px;padding:.5rem;color:#fff;font-family:var(--fb);font-size:13px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;cursor:pointer;">✅ APROBAR</button>' +
-          '<button data-sid="'+doc.id+'" data-nombre="'+escHtml(d.nombre||'')+'" data-uid="'+escHtml(d.uid||'')+'" onclick="admRechazarPerfilBtn(this)" style="flex:1;background:rgba(244,63,94,.12);border:1px solid rgba(244,63,94,.35);border-radius:9px;padding:.5rem;color:var(--red);font-family:var(--fb);font-size:13px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;cursor:pointer;">❌ RECHAZAR</button>' +
-        '</div>';
-      listEl.appendChild(card);
-    });
-  } catch(e) {
-    if(listEl) listEl.innerHTML = '<p style="color:var(--red);font-size:14px;">Error: '+e.message+'</p>';
-  }
-}
-
-function admAprobarPerfilBtn(btn) {
-  admAprobarPerfil(btn.getAttribute('data-sid'), btn.getAttribute('data-nombre'), btn.getAttribute('data-email'), btn.getAttribute('data-uid'));
-}
-function admRechazarPerfilBtn(btn) {
-  admRechazarPerfil(btn.getAttribute('data-sid'), btn.getAttribute('data-nombre'), btn.getAttribute('data-uid'));
-}
-
-async function admAprobarPerfil(slotId, nombre, email, profUid) {
-  try {
-    // Forzar refresh del token para que las reglas de Firestore reconozcan el email del admin
-    if (auth.currentUser) await auth.currentUser.getIdToken(true);
-
-    // Intentar update directo en profesores_registrados (requiere regla admin en Firestore)
-    let okProfReg = false;
-    try {
-      await db.collection('profesores_registrados').doc(slotId).update({
-        perfilEstado: 'activo',
-        motivoRechazo: firebase.firestore.FieldValue.delete()
-      });
-      okProfReg = true;
-    } catch(eReg) {
-      // Fallback: si el profesor tiene uid, actualizar en users/{uid}.perfilProfesor
-      if (profUid) {
-        try {
-          await db.collection('users').doc(profUid).update({
-            'perfilProfesor.perfilEstado': 'activo',
-            'perfilProfesor.motivoRechazo': firebase.firestore.FieldValue.delete()
-          });
-          okProfReg = true;
-        } catch(eUser) {
-          console.warn('admAprobarPerfil fallback users también falló:', eUser.message);
-        }
-      }
-      if (!okProfReg) {
-        showToast('❌ Sin permiso en Firestore. Actualizá las reglas (ver panel admin → 🔐 Reglas Firestore).');
-        console.error('Regla faltante en profesores_registrados. Error original:', eReg.message);
-        return;
-      }
-    }
-
-    // Notificación al profesor
-    if (profUid) {
-      try {
-        await db.collection('users').doc(profUid).collection('notificaciones').add({
-          tipo:    'perfil_aprobado',
-          mensaje: '✅ Tu perfil fue aprobado. Ya aparecés en la lista de alumnos.',
-          leido:   false,
-          ts:      firebase.firestore.FieldValue.serverTimestamp()
-        });
-      } catch(eNotif) { console.warn('No se pudo crear notificación:', eNotif.message); }
-    }
-
-    showToast('✅ Perfil de ' + nombre + ' aprobado');
-    const el = g('perfil-pend-' + slotId); if(el) el.remove();
-    cargarProfesoresAdmin();
-    cargarPerfilesPendientes();
-    // Abrir cliente de correo con email de bienvenida
-    if (email) {
-      const asunto = encodeURIComponent('✅ Tu perfil en Fit Ladder fue aprobado');
-      const cuerpo = encodeURIComponent('Hola ' + nombre + ',\n\n¡Excelentes noticias! Tu solicitud para formar parte del staff de Fit Ladder fue APROBADA.\n\n✅ Tu perfil ya es visible para todos los alumnos de la plataforma.\n\nPara activar tu cuenta:\n1. Abrí Fit Ladder\n2. Tocá "🎓 Soy profesor registrado"\n3. Ingresá tu nombre: ' + nombre + '\n4. Completá tu registro con email y contraseña\n\n¡Bienvenido/a al equipo!\n\n— Equipo Fit Ladder\nfitladder2026@gmail.com');
-      setTimeout(() => {
-        window.open('mailto:' + email + '?subject=' + asunto + '&body=' + cuerpo, '_blank');
-      }, 500);
-    }
-  } catch(e) { showToast('❌ Error: ' + e.message); }
-}
-
-async function admRechazarPerfil(slotId, nombre, profUid) {
-  // Pedir motivo con un prompt inline
-  const overlay = document.createElement('div');
-  overlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,.85);z-index:9999;display:flex;align-items:center;justify-content:center;padding:1.5rem;backdrop-filter:blur(8px);';
-  overlay.innerHTML = `
-    <div style="background:var(--bg2);border:1px solid var(--border);border-radius:14px;padding:1.4rem;width:100%;max-width:380px;display:flex;flex-direction:column;gap:.8rem;">
-      <div style="font-family:var(--fd);font-size:22px;letter-spacing:1px;">❌ Rechazar perfil</div>
-      <div style="font-size:15px;color:var(--muted);">Ingresá el motivo del rechazo. Se lo enviará al profesor.</div>
-      <textarea id="motivo-rechazo-inp" style="background:var(--bg3);border:1px solid var(--border);border-radius:10px;color:var(--text);font-family:var(--fb);font-size:16px;padding:.65rem .85rem;min-height:80px;resize:none;width:100%;outline:none;" placeholder="Ej: Falta especificar la especialidad, la bio es muy corta…" maxlength="300"></textarea>
-      <div style="display:flex;gap:.5rem;">
-        <button onclick="confirmarRechazo('${slotId}','${escHtml(nombre)}','${escHtml(profUid)}')" style="flex:1;background:var(--red);border:none;border-radius:9px;padding:.6rem;color:#fff;font-family:var(--fb);font-size:14px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;cursor:pointer;">CONFIRMAR RECHAZO</button>
-        <button onclick="this.closest('[style*=fixed]').remove()" style="flex:1;background:none;border:1px solid var(--border);border-radius:9px;padding:.6rem;color:var(--muted);font-family:var(--fb);font-size:14px;font-weight:700;cursor:pointer;">Cancelar</button>
-      </div>
-    </div>`;
-  overlay.addEventListener('click', e => { if(e.target===overlay) overlay.remove(); });
-  document.body.appendChild(overlay);
-  setTimeout(() => g('motivo-rechazo-inp')?.focus(), 100);
-}
-
-async function confirmarRechazo(slotId, nombre, profUid) {
-  const motivo = g('motivo-rechazo-inp')?.value.trim() || '';
-  if (!motivo) { showToast('⚠ Ingresá el motivo'); return; }
-  // Get email for this prof
-  let profEmail = '';
-  try {
-    if (profUid) {
-      const ud = await db.collection('users').doc(profUid).get();
-      profEmail = ud.data()?.email || '';
-    } else {
-      const ss = await db.collection('profesores_registrados').doc(slotId).get();
-      profEmail = ss.data()?.email || '';
-    }
-  } catch(e) {}
-  try {
-    if (auth.currentUser) await auth.currentUser.getIdToken(true);
-
-    // Intentar update en profesores_registrados (requiere regla admin)
-    let okProfReg = false;
-    try {
-      await db.collection('profesores_registrados').doc(slotId).update({ perfilEstado: 'rechazado', motivoRechazo: motivo });
-      okProfReg = true;
-    } catch(eReg) {
-      if (profUid) {
-        try {
-          await db.collection('users').doc(profUid).update({
-            'perfilProfesor.perfilEstado': 'rechazado',
-            'perfilProfesor.motivoRechazo': motivo
-          });
-          okProfReg = true;
-        } catch(eUser) { console.warn('confirmarRechazo fallback falló:', eUser.message); }
-      }
-      if (!okProfReg) {
-        showToast('❌ Sin permiso en Firestore. Actualizá las reglas (ver panel admin → 🔐 Reglas Firestore).');
-        console.error('Regla faltante en profesores_registrados:', eReg.message);
-        return;
-      }
-    }
-
-    if (profUid) {
-      try {
-        await db.collection('users').doc(profUid).collection('notificaciones').add({
-          tipo:    'perfil_rechazado',
-          mensaje: '❌ Tu perfil fue rechazado. Motivo: ' + motivo,
-          leido:   false,
-          ts:      firebase.firestore.FieldValue.serverTimestamp()
-        });
-      } catch(eNotif) { console.warn('No se pudo crear notificación:', eNotif.message); }
-    }
-    showToast('✅ Rechazado');
-    document.querySelector('[style*="fixed"][style*="inset"]')?.remove();
-    cargarProfesoresAdmin();
-    cargarPerfilesPendientes();
-    // Email de rechazo
-    if (profEmail) {
-      const asunto = encodeURIComponent('Sobre tu solicitud en Fit Ladder');
-      const cuerpo = encodeURIComponent('Hola ' + nombre + ',\n\nRevisamos tu solicitud para formar parte del staff de Fit Ladder y lamentablemente no podemos aprobarla en este momento.\n\nMotivo: ' + motivo + '\n\nPodés editar tu perfil y volver a enviar la solicitud cuando hayas realizado los ajustes necesarios.\n\n— Equipo Fit Ladder\nfitladder2026@gmail.com');
-      setTimeout(() => {
-        window.open('mailto:' + profEmail + '?subject=' + asunto + '&body=' + cuerpo, '_blank');
-      }, 500);
-    }
-  } catch(e) { showToast('❌ Error: ' + e.message); }
-}
-
-async function sincronizarPerfilesProfesor() {
-  // Sync perfilProfesor from users docs → profesores_registrados
-  // Solo sincroniza campos de contenido (bio, especialidad, ig, etc.)
-  // NO sincroniza perfilEstado ni motivoRechazo para no sobreescribir aprobaciones del admin
-  try {
-    const snap = await db.collection('profesores_registrados').where('habilitado','==',true).get();
-    const batch = db.batch();
-    let count = 0;
-    for (const doc of snap.docs) {
-      const d = doc.data();
-      if (!d.uid) continue;
-      try {
-        const ud = await db.collection('users').doc(d.uid).get();
-        const pp = ud.data()?.perfilProfesor;
-        if (pp) {
-          // Excluir perfilEstado y motivoRechazo — son campos que gestiona el admin
-          const { perfilEstado, motivoRechazo, ...camposSeguros } = pp;
-          if (Object.keys(camposSeguros).length > 0) {
-            batch.update(doc.ref, camposSeguros);
-            count++;
-          }
-        }
-      } catch(e) {}
-    }
-    if (count > 0) {
-      await batch.commit();
-      showToast('✅ ' + count + ' perfil(es) sincronizado(s)');
-      // NO llamar cargarProfesoresAdmin() aquí — causaría loop infinito
-    }
-  } catch(e) {}
-}
-
-async function cargarProfesoresAdmin() {
-  cargarPerfilesPendientes();
-  // sincronizarPerfilesProfesor() se llama solo desde el botón manual del panel
-  // No llamarla aquí — causaría loop infinito con cargarProfesoresAdmin()
-  var listEl = g('adm-prof-list');
-  if (!listEl) return;
-  listEl.innerHTML = '<div class="admin-loading" style="padding:.6rem 0"><div class="auth-spinner" style="width:14px;height:14px;border-width:2px;border-top-color:#7c3aed"></div> CARGANDO\u2026</div>';
-  try {
-    var snap = await db.collection('profesores_registrados').orderBy('creadoAt', 'desc').get();
-    if (snap.empty) {
-      listEl.innerHTML = '<p class="empty-msg" style="padding:.8rem 0;font-style:italic">No hay profesores registrados. Us\u00e1 \u201c+ A\u00f1adir profesor\u201d para crear uno.</p>';
-      return;
-    }
-    listEl.innerHTML = '';
-    snap.forEach(function(doc) {
-      listEl.appendChild(renderProfCard(doc.id, doc.data()));
-    });
-  } catch(e) {
-    listEl.innerHTML = '<p class="empty-msg" style="color:var(--red);padding:.8rem 0">Error al cargar: ' + e.message + '</p>';
-  }
-}
-
-function renderProfCard(id, d) {
-  var card = document.createElement('div');
-  var linked   = !!d.uid;
-  var disabled = d.habilitado === false;
-  // Account state badge
-  var acctEstado, acctClass;
-  if (!linked)       { acctEstado = 'Sin cuenta'; acctClass = 'pendiente'; }
-  else if (disabled) { acctEstado = 'Cuenta deshabilitada'; acctClass = 'deshabilitado'; }
-  else               { acctEstado = 'Cuenta activa'; acctClass = 'activo'; }
-  // Profile state badge
-  var perfilEst = d.perfilEstado || (d.bio ? 'pendiente' : 'incompleto');
-  var perfilLabels = { incompleto:'🟡 Sin perfil', pendiente:'🔵 Pendiente revisión', activo:'✅ Perfil activo', rechazado:'❌ Rechazado', revision:'🔄 En revisión' };
-  var perfilBadge  = perfilLabels[perfilEst] || '🟡 Sin perfil';
-  var perfilColor  = { incompleto:'var(--muted)', pendiente:'var(--blue3)', activo:'var(--green)', rechazado:'var(--red)', revision:'var(--yellow)' }[perfilEst] || 'var(--muted)';
-
-  var ini = (d.nombre||'?').trim().split(' ').slice(0,2).map(function(p){return p[0];}).join('').toUpperCase();
-  var emailStr = d.email || '';
-  var toggleBtn = '';
-  if (linked) {
-    toggleBtn = disabled
-      ? '<button class="prof-toggle-btn enable" onclick="toggleProfesor(this)" data-id="'+id+'" data-habilitar="true">HABILITAR</button>'
-      : '<button class="prof-toggle-btn disable" onclick="toggleProfesor(this)" data-id="'+id+'" data-habilitar="false">DESHABL.</button>';
-  }
-
-  card.className = 'prof-card' + (disabled ? ' prof-disabled' : '');
-  card.id = 'prof-card-' + id;
-  // Profile review buttons (if profile is pending or in revision)
-  var reviewBtns = '';
-  if (linked && (perfilEst === 'pendiente' || perfilEst === 'revision')) {
-    reviewBtns =
-      '<div style="width:100%;display:flex;gap:.4rem;margin-top:.45rem;">' +
-        '<button data-sid="'+id+'" data-nombre="'+escHtml(d.nombre||'')+'" data-email="'+escHtml(d.email||'')+'" data-uid="'+escHtml(d.uid||'')+'" onclick="admAprobarPerfilBtn(this)" style="flex:1;background:rgba(16,185,129,.15);border:1px solid rgba(16,185,129,.4);border-radius:8px;padding:.4rem;color:var(--green);font-family:var(--fb);font-size:11px;font-weight:900;letter-spacing:.06em;cursor:pointer;">✅ APROBAR</button>' +
-        '<button data-sid="'+id+'" data-nombre="'+escHtml(d.nombre||'')+'" data-uid="'+escHtml(d.uid||'')+'" onclick="admRechazarPerfilBtn(this)" style="flex:1;background:rgba(244,63,94,.1);border:1px solid rgba(244,63,94,.3);border-radius:8px;padding:.4rem;color:var(--red);font-family:var(--fb);font-size:11px;font-weight:900;letter-spacing:.06em;cursor:pointer;">❌ RECHAZAR</button>' +
-      '</div>';
-    if (d.bio) {
-      reviewBtns = '<div style="font-size:13px;color:var(--muted);background:var(--bg3);border-radius:8px;padding:.5rem .7rem;margin-top:.35rem;line-height:1.5;"><em>'+escHtml(d.bio)+'</em></div>' + reviewBtns;
-    }
-  }
-
-  card.innerHTML =
-    '<div class="prof-avatar' + (linked ? ' linked' : '') + '">' + ini + '</div>' +
-    '<div class="prof-info" style="flex:1;min-width:0;">' +
-      '<div class="prof-name">' + escHtml(d.nombre||'Sin nombre') + '</div>' +
-      '<div class="prof-sub">' +
-        '<span class="prof-badge ' + acctClass + '">' + acctEstado + '</span>' +
-        '<span style="font-size:11px;color:'+perfilColor+';font-weight:700;">' + perfilBadge + '</span>' +
-        (emailStr ? '<span style="font-size:11px;color:var(--muted);">'+escHtml(emailStr)+'</span>' : '') +
-      '</div>' +
-      reviewBtns +
-    '</div>' +
-    toggleBtn +
-    '<button class="prof-del-btn" onclick="eliminarProfesor(this)" data-id="'+id+'" data-nombre="'+escHtml(d.nombre||'')+'" title="Eliminar">' +
-      '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4h6v2"/></svg>' +
-    '</button>';
-  return card;
-}
-
-function abrirModalCrearProfesor() {
-  var modal = g('prof-modal');
-  if (!modal) return;
-  g('prof-nuevo-nombre').value = '';
-  g('prof-nuevo-fecha').value  = '';
-  g('prof-modal-err').style.display = 'none';
-  var btn = g('prof-crear-btn');
-  btn.disabled = false;
-  btn.innerHTML = '<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/><line x1="19" y1="8" x2="19" y2="14"/><line x1="22" y1="11" x2="16" y2="11"/></svg> CREAR PERFIL DE PROFESOR';
-  modal.classList.remove('hidden');
-  setTimeout(function(){ g('prof-nuevo-nombre').focus(); }, 150);
-}
-
-function cerrarModalCrearProfesor() {
-  var modal = g('prof-modal');
-  if (modal) modal.classList.add('hidden');
-}
-
-async function crearProfesorRegistrado() {
-  var nombre = (g('prof-nuevo-nombre').value || '').trim();
-  var fecha  = (g('prof-nuevo-fecha').value  || '').trim();
-  var errEl  = g('prof-modal-err');
-  var btn    = g('prof-crear-btn');
-  errEl.style.display = 'none';
-  if (!nombre) { errEl.textContent = '\u26a0 Ingres\u00e1 el nombre del profesor.'; errEl.style.display = 'block'; return; }
-  btn.disabled = true;
-  btn.textContent = 'GUARDANDO…';
-  try {
-    if (auth.currentUser) await auth.currentUser.getIdToken(true);
-    var snap = await db.collection('profesores_registrados').get();
-    var existe = snap.docs.some(function(d){ return d.data().nombre.toLowerCase().trim() === nombre.toLowerCase(); });
-    if (existe) {
-      errEl.textContent = '\u26a0 Ya existe un profesor con ese nombre.';
-      errEl.style.display = 'block';
-      btn.disabled = false;
-      btn.textContent = 'CREAR PERFIL DE PROFESOR';
-      return;
-    }
-    await db.collection('profesores_registrados').add({
-      nombre: nombre,
-      habilitado: true,
-      fechaHabilitacion: fecha || null,
-      creadoAt: firebase.firestore.FieldValue.serverTimestamp(),
-      creadoPor: auth.currentUser ? auth.currentUser.displayName || 'Admin' : 'Admin',
-      uid: null,
-      email: null
-    });
-    cerrarModalCrearProfesor();
-    showToast('\u2705 PROFESOR REGISTRADO');
-    cargarProfesoresAdmin();
-  } catch(e) {
-    errEl.textContent = '\u274c Error: ' + e.message;
-    errEl.style.display = 'block';
-    btn.disabled = false;
-    btn.textContent = 'CREAR PERFIL DE PROFESOR';
-  }
-}
-
-async function toggleProfesor(btn) {
-  var id       = btn.dataset.id;
-  var habilitar = btn.dataset.habilitar === 'true';
-  try {
-    if (auth.currentUser) await auth.currentUser.getIdToken(true);
-    await db.collection('profesores_registrados').doc(id).update({ habilitado: habilitar });
-    showToast(habilitar ? '\u2705 PROFESOR HABILITADO' : '\ud83dude45 PROFESOR DESHABILITADO');
-    cargarProfesoresAdmin();
-  } catch(e) {
-    showToast('\u274c Error: ' + e.message);
-  }
-}
-
-async function eliminarProfesor(btn) {
-  var id     = btn.dataset.id;
-  var nombre = btn.dataset.nombre;
-  if (!confirm('¿Eliminar el perfil de "' + nombre + '"? Si ya tiene cuenta, NO se elimina su cuenta de Firebase.')) return;
-  try {
-    if (auth.currentUser) await auth.currentUser.getIdToken(true);
-    await db.collection('profesores_registrados').doc(id).delete();
-    showToast('\ud83dude97 PERFIL DE PROFESOR ELIMINADO');
-    cargarProfesoresAdmin();
-  } catch(e) {
-    showToast('\u274c Error: ' + e.message);
-  }
-}
-
-function toggleProfSection() {
-  var sec = g('prof-auth-section');
-  if (!sec) return;
-  var visible = sec.style.display !== 'none';
-  sec.style.display = visible ? 'none' : 'block';
-  if (!visible) setTimeout(function(){ var el = g('prof-reg-nombre'); if(el) el.focus(); }, 100);
-}
-
-async function abrirRegistroProfesor() {
-  var nombre = (g('prof-reg-nombre') ? g('prof-reg-nombre').value : '').trim();
-  var errEl  = g('prof-auth-err');
-  errEl.style.display = 'none';
-  if (!nombre) { errEl.textContent = '\u26a0 Ingres\u00e1 tu nombre.'; errEl.style.display = 'block'; return; }
-  try {
-    var snap = await db.collection('profesores_registrados').get();
-    var slotDoc = null;
-    snap.forEach(function(doc) {
-      var d = doc.data();
-      if (d.nombre.toLowerCase().trim() === nombre.toLowerCase() && !d.uid) {
-        slotDoc = { id: doc.id, nombre: d.nombre, habilitado: d.habilitado, fechaHabilitacion: d.fechaHabilitacion };
-      }
-    });
-    if (!slotDoc) {
-      errEl.textContent = '\u26a0 No encontramos ese nombre. Verific\u00e1 con tu administrador.';
-      errEl.style.display = 'block'; return;
-    }
-    if (slotDoc.habilitado === false) {
-      errEl.textContent = '\ud83dude45 Tu cuenta est\u00e1 deshabilitada. Contact\u00e1 al administrador.';
-      errEl.style.display = 'block'; return;
-    }
-    if (slotDoc.fechaHabilitacion) {
-      var hoy = new Date().toISOString().split('T')[0];
-      if (hoy < slotDoc.fechaHabilitacion) {
-        errEl.textContent = '\ud83dudcc5 Tu cuenta se habilitar\u00e1 a partir del ' + slotDoc.fechaHabilitacion + '.';
-        errEl.style.display = 'block'; return;
-      }
-    }
-    g('prof-reg-nombre-confirm').value = slotDoc.nombre;
-    g('prof-reg-email').value  = '';
-    g('prof-reg-pass').value   = '';
-    g('prof-reg-pass2').value  = '';
-    g('prof-reg-err').style.display = 'none';
-    g('prof-reg-desc').textContent = '\u00a1Hola, ' + slotDoc.nombre + '! Complet\u00e1 tus datos para activar tu cuenta.';
-    var modal = g('prof-reg-modal');
-    modal.dataset.slotId     = slotDoc.id;
-    modal.dataset.slotNombre = slotDoc.nombre;
-    modal.classList.remove('hidden');
-    setTimeout(function(){ g('prof-reg-email').focus(); }, 150);
-  } catch(e) {
-    errEl.textContent = '\u274c Error de conexi\u00f3n. Verific\u00e1 tu internet.';
-    errEl.style.display = 'block';
-  }
-}
-
-function cerrarRegistroProfesor() {
-  var modal = g('prof-reg-modal');
-  if (modal) modal.classList.add('hidden');
-}
-
-async function registrarProfesor() {
-  var modal  = g('prof-reg-modal');
-  var slotId = modal.dataset.slotId;
-  var nombre = modal.dataset.slotNombre;
-  var email  = (g('prof-reg-email').value || '').trim();
-  var pass   = g('prof-reg-pass').value;
-  var pass2  = g('prof-reg-pass2').value;
-  var errEl  = g('prof-reg-err');
-  var btn    = g('prof-reg-btn');
-  errEl.style.display = 'none';
-  if (!email)          { errEl.textContent = '⚠ Ingresá tu email.'; errEl.style.display = 'block'; return; }
-  if (pass.length < 6) { errEl.textContent = '⚠ La contraseña debe tener al menos 6 caracteres.'; errEl.style.display = 'block'; return; }
-  btn.disabled = true;
-  btn.textContent = 'ACTIVANDO…';
-
-  // Helper para vincular el slot al usuario logueado
-  async function vincularSlot(user) {
-    await db.collection('profesores_registrados').doc(slotId).update({
-      uid:            user.uid,
-      email:          user.email,
-      cuentaCreadaAt: firebase.firestore.FieldValue.serverTimestamp(),
-      habilitado:     true
-    });
-    await db.collection('users').doc(user.uid).set({
-      name: nombre, email: user.email, role: 'profesor', profSlotId: slotId,
-      ultimaConexion: firebase.firestore.FieldValue.serverTimestamp()
-    }, { merge: true });
-  }
-
-  try {
-    // Intentar crear cuenta nueva
-    var result = await auth.createUserWithEmailAndPassword(email, pass);
-    await result.user.updateProfile({ displayName: nombre });
-    await vincularSlot(result.user);
-    cerrarRegistroProfesor();
-    showToast('✅ ¡Bienvenido/a, ' + nombre.toUpperCase() + '!');
-
-  } catch(e) {
-    if (e.code === 'auth/email-already-in-use') {
-      // El email ya tiene cuenta → iniciar sesión con esa cuenta existente
-      btn.textContent = 'INICIANDO SESIÓN…';
-      try {
-        var cred = await auth.signInWithEmailAndPassword(email, pass);
-        await vincularSlot(cred.user);
-        cerrarRegistroProfesor();
-        showToast('✅ ¡Perfil de profesor activado, ' + nombre.toUpperCase() + '!');
-      } catch(e2) {
-        btn.disabled = false;
-        btn.textContent = '✅ ACTIVAR MI PERFIL DE PROFESOR';
-        if (e2.code === 'auth/wrong-password' || e2.code === 'auth/invalid-credential') {
-          errEl.textContent = '⚠ Contraseña incorrecta para esa cuenta. Ingresá la contraseña de tu cuenta Fit Ladder existente.';
-        } else {
-          errEl.textContent = '❌ Error: ' + e2.message;
-        }
-        errEl.style.display = 'block';
-        // Mostrar info de que ya tiene cuenta
-        var infoEl = g('prof-reg-info');
-        if (infoEl) infoEl.style.display = 'block';
-        // Ocultar campo de confirmación (no necesario para login)
-        var pass2wrap = g('prof-reg-pass2-wrap');
-        if (pass2wrap) pass2wrap.style.display = 'none';
-      }
-    } else {
-      btn.disabled = false;
-      btn.textContent = '✅ ACTIVAR MI PERFIL DE PROFESOR';
-      var msgs = {
-        'auth/invalid-email':  '⚠ El email no es válido.',
-        'auth/weak-password':  '⚠ La contraseña es muy débil.'
-      };
-      errEl.textContent = msgs[e.code] || '❌ Error: ' + e.message;
-      errEl.style.display = 'block';
-    }
-  }
-}
-
-
 /* ══ ADMIN TABS ══ */
 let _admTabActual = 'usuarios';
 let _admUltimosUsuarios = 0; // para detectar nuevos
 
 
-async function admCargarSolicitudesStaffBadge() {
-  try {
-    const snap = await db.collection('fl_soporte')
-      .where('categoria','==','quiero_staff').where('leido','==',false).get();
-    if (!snap.empty) {
-      const b = g('adm-badge-profs');
-      if (b) { b.textContent = snap.size; b.style.display = 'inline-block'; }
-    }
-  } catch(e) {}
-}
-
 const ADM_LABELS = {
   usuarios:   '👥 Usuarios',
-  profesores: '🎓 Profesores',
   mensajes:   '✉ Mensajes',
   push:       '🔔 Notificaciones Push',
 };
@@ -14249,19 +12057,13 @@ async function abrirMetricas() {
 
 function admSwitchTab(tab) {
   _admTabActual = tab;
-  ['usuarios','profesores','mensajes','push'].forEach(t => {
+  ['usuarios','mensajes','push'].forEach(t => {
     g('adm-tab-' + t)?.classList.toggle('active', t === tab);
     g('adm-panel-' + t)?.classList.toggle('hidden', t !== tab);
   });
   // Actualizar label topbar admin
   const secEl = g('adm-topbar-section');
   if (secEl && ADM_LABELS[tab]) secEl.textContent = ADM_LABELS[tab];
-  if (tab === 'profesores') {
-    cargarProfesoresAdmin();
-    admCargarSolicitudesStaff();
-    const b = g('adm-badge-profs');
-    if (b) b.style.display = 'none';
-  }
   if (tab === 'usuarios') {
     admDismissNuevos();
   }
@@ -14299,105 +12101,6 @@ function admChequearNuevosUsuarios(total) {
       }
     }
   } catch(e) {}
-}
-
-async function admCargarSolicitudesStaff() {
-  const blk   = g('adm-solicitudes-staff-blk');
-  const lista = g('adm-solicitudes-staff-list');
-  const cnt   = g('adm-sol-staff-count');
-  if (!blk || !lista) return;
-  try {
-    const snap = await db.collection('fl_soporte')
-      .where('categoria','==','quiero_staff').where('leido','==',false).get();
-    if (snap.empty) { blk.style.display = 'none'; return; }
-    blk.style.display = 'block';
-    if (cnt) cnt.textContent = snap.size + ' pendiente' + (snap.size !== 1 ? 's' : '');
-    // Badge en el tab
-    const b = g('adm-badge-profs');
-    if (b) { b.textContent = snap.size; b.style.display = 'inline-block'; }
-    lista.innerHTML = '';
-    snap.forEach(doc => {
-      const d   = doc.data();
-      const p   = d.perfil || {};
-      const card = document.createElement('div');
-      card.style.cssText = 'background:rgba(124,58,237,.07);border:1px solid rgba(124,58,237,.3);border-radius:12px;padding:.75rem .9rem;display:flex;flex-direction:column;gap:.45rem;';
-      card.innerHTML = `
-        <div style="display:flex;align-items:center;justify-content:space-between;gap:.5rem;">
-          <div>
-            <div style="font-family:var(--fd);font-size:17px;color:var(--text);">${escHtml(d.nombre||'Solicitante')}</div>
-            <div style="font-size:12px;color:var(--muted);">${escHtml(d.email||'')}</div>
-          </div>
-          <span style="font-size:11px;color:#a78bfa;font-weight:700;">🎓 Solicitud staff</span>
-        </div>
-        ${p.especialidad?'<div style="font-size:13px;color:var(--blue3);font-weight:700;">'+escHtml(p.especialidad)+'</div>':''}
-        ${p.bio?'<div style="font-size:13px;color:var(--muted);line-height:1.5;"><em>'+escHtml(p.bio)+'</em></div>':''}
-        <div style="display:flex;gap:.4rem;flex-wrap:wrap;">
-          ${d.email?'<button data-email="'+d.email+'" data-nombre="'+escHtml(d.nombre||'')+'" onclick="admEmailStaffBtn(this)" style="background:rgba(124,58,237,.15);border:1px solid rgba(124,58,237,.3);border-radius:8px;padding:.4rem .7rem;color:#a78bfa;font-family:var(--fb);font-size:12px;font-weight:700;cursor:pointer;">✉ Responder</button>':''}
-          <button onclick="admMarcarSolStaff('${doc.id}')" style="background:none;border:1px solid var(--border);border-radius:8px;padding:.4rem .7rem;color:var(--muted);font-family:var(--fb);font-size:12px;font-weight:700;cursor:pointer;">✓ Marcar leída</button>
-        </div>`;
-      lista.appendChild(card);
-    });
-  } catch(e) {
-    blk.style.display = 'none';
-  }
-}
-
-async function admMarcarSolStaff(docId) {
-  try {
-    await db.collection('fl_soporte').doc(docId).update({ leido: true });
-    admCargarSolicitudesStaff();
-  } catch(e) {}
-}
-
-// profesores: carga integrada en abrirPanelAdmin directamente
-
-// ════ NOTIFICACIÓN EMAIL — NUEVO USUARIO ══════════════════════════════════
-// Usa EmailJS (emailjs.com) — servicio gratuito, 200 emails/mes sin backend.
-// Pasos de configuración (hacerlo UNA sola vez):
-//   1. Crear cuenta en https://www.emailjs.com (gratis)
-//   2. Add New Service → Gmail → conectar fitladder2026@gmail.com → copiar SERVICE_ID
-//   3. Email Templates → Create New Template → copiar TEMPLATE_ID
-//      En el template usar las variables: {{from_name}}, {{from_email}}, {{fecha}}, {{numero}}
-//   4. Account → API Keys → copiar Public Key → reemplazar "YOUR_PUBLIC_KEY" arriba en el <head>
-//   5. Reemplazar EMAILJS_SERVICE_ID y EMAILJS_TEMPLATE_ID abajo con tus valores reales
-
-const EMAILJS_SERVICE_ID  = "service_tbndzqi";
-const EMAILJS_TEMPLATE_ID = "template_1hs0gmq";
-const NOTIF_ADMIN_EMAIL   = "fitladder2026@gmail.com";
-
-async function notifyAdminNuevoUsuario({ name, email }) {
-  try {
-    if (typeof emailjs === 'undefined') return;
-    if (EMAILJS_SERVICE_ID === "YOUR_SERVICE_ID") return; // no configurado aún
-
-    // Init aquí para garantizar que el SDK ya cargó
-    emailjs.init({ publicKey: "sSf2mZcIfPPXwTS0O" });
-
-    const ahora = new Date();
-    const fecha = ahora.toLocaleDateString('es-AR', {
-      day: '2-digit', month: '2-digit', year: 'numeric',
-      hour: '2-digit', minute: '2-digit'
-    });
-
-    // Obtener número correlativo actual para incluir en el email
-    let numeroUsuario = "—";
-    try {
-      const snap = await db.collection('fl_config').doc('contador_usuarios').get();
-      if (snap.exists) numeroUsuario = snap.data().total || "—";
-    } catch(e) {}
-
-    await emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, {
-      to_email:    NOTIF_ADMIN_EMAIL,
-      from_name:   name,
-      from_email:  email,
-      fecha:       fecha,
-      numero:      numeroUsuario,
-    });
-    console.log("✅ Notificación enviada al admin");
-  } catch(e) {
-    // Silencioso — no interrumpir el registro del usuario
-    console.warn("No se pudo enviar notificación admin:", e.message || e);
-  }
 }
 
 // ════ TABLA % DE ENTRENAMIENTO ════════════════════════════════════════════
@@ -14496,12 +12199,7 @@ async function notifyAdminNuevoUsuario({ name, email }) {
         Usuarios
         <span class="adm-drawer-badge" id="adm-badge-nuevos" style="display:none;">0</span>
       </button>
-      <button class="adm-drawer-item" id="adm-tab-profesores" onclick="admDrawerTab('profesores')">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 10v6M2 10l10-5 10 5-10 5z"/><path d="M6 12v5c3 3 9 3 12 0v-5"/></svg>
-        Profesores
-        <span class="adm-drawer-badge" id="adm-badge-profs" style="display:none;">0</span>
-      </button>
-      <button class="adm-drawer-item" id="adm-tab-mensajes" onclick="admDrawerTab('mensajes')">
+            <button class="adm-drawer-item" id="adm-tab-mensajes" onclick="admDrawerTab('mensajes')">
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
         Mensajes
         <span class="adm-drawer-badge" id="adm-badge-msgs" style="display:none;">0</span>
@@ -14577,34 +12275,7 @@ async function notifyAdminNuevoUsuario({ name, email }) {
       <div id="adm-user-list">
         <div class="admin-loading"><div class="auth-spinner"></div>CARGANDO USUARIOS…</div>
       </div>
-
-      <!-- Vincular alumnos con profesores (botón semanal) -->
-      <div id="adm-vincular-semanal-wrap" style="margin-bottom:.6rem;">
-        <button onclick="admAbrirSesionVinculacion()" style="display:flex;align-items:center;justify-content:center;gap:.55rem;width:100%;background:linear-gradient(135deg,#7c3aed,#2563eb);border:none;border-radius:11px;padding:.75rem 1rem;color:#fff;font-family:var(--fb);font-size:15px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;cursor:pointer;box-shadow:0 4px 20px rgba(124,58,237,.3);">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
-          🗓 VINCULAR ALUMNOS CON PROFESOR
-        </button>
-        <div id="adm-vincular-semanal-info" style="font-size:12px;color:var(--muted);text-align:center;margin-top:.3rem;"></div>
-      </div>
-
-      <!-- Herramientas de usuario -->
-      <div class="admin-section-hdr" style="margin-bottom:.2rem">Herramientas</div>
-      <div class="admin-toolbar">
-        <button class="admin-tool-btn" id="btn-limpiar-huerfanos" onclick="limpiarCuentasHuerfanas()">
-          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4h6v2"/></svg>
-          Limpiar cuentas eliminadas
-        </button>
-        <button class="admin-tool-btn" onclick="cargarUsuariosAdmin()">
-          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>
-          Actualizar lista
-        </button>
-        <button class="admin-tool-btn" onclick="abrirAsignarNumerosUsuario()">
-          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="6"/><path d="M12 14v7"/><path d="M9 18h6"/></svg>
-          Asignar insignias retroactivas
-        </button>
-      </div>
-
-    </div>
+    </div><!-- /adm-panel-usuarios -->
 
     <!-- ══ PANEL MENSAJES ══ -->
     <div class="adm-panel hidden" id="adm-panel-mensajes">
@@ -14646,75 +12317,6 @@ async function notifyAdminNuevoUsuario({ name, email }) {
       </div>
     </div>
 
-    <!-- ══ PANEL PROFESORES ══ -->
-    <div class="adm-panel hidden" id="adm-panel-profesores">
-
-      <!-- Solicitudes staff pendientes (desde fl_soporte) -->
-      <div id="adm-solicitudes-staff-blk" style="display:none;">
-        <div class="admin-section-hdr" style="color:var(--yellow);margin-bottom:.5rem;">
-          🔔 Solicitudes para ser profesor
-          <span id="adm-sol-staff-count" style="color:var(--yellow);"></span>
-        </div>
-        <div id="adm-solicitudes-staff-list" style="display:flex;flex-direction:column;gap:.5rem;margin-bottom:.5rem;"></div>
-      </div>
-
-      <!-- Perfiles pendientes de revisión -->
-      <div class="admin-section-hdr" style="margin-bottom:.5rem;color:var(--yellow);" id="adm-perfiles-hdr">
-        🔵 Perfiles pendientes de revisión
-        <span id="adm-perfiles-count"></span>
-      </div>
-      <div id="adm-perfiles-list" style="display:flex;flex-direction:column;gap:.55rem;margin-bottom:.3rem;"></div>
-
-      <!-- Profesores registrados -->
-      <div class="admin-section-hdr" style="margin-bottom:.5rem">
-        Profesores registrados
-        <button class="btn-add-prof" onclick="abrirModalCrearProfesor()">
-          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-          Añadir
-        </button>
-      </div>
-      <div id="adm-prof-list" style="display:flex;flex-direction:column;gap:.55rem;">
-        <div class="admin-loading" style="padding:.6rem 0"><div class="auth-spinner" style="width:14px;height:14px;border-width:2px;border-top-color:#7c3aed"></div> CARGANDO…</div>
-      </div>
-
-      <!-- Herramientas de profesor -->
-      <div class="admin-section-hdr" style="margin-bottom:.2rem">Herramientas</div>
-      <div class="admin-toolbar">
-        <button class="admin-tool-btn" onclick="sincronizarPerfilesProfesor()">
-          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 .49-3.51"/></svg>
-          Sincronizar perfiles
-        </button>
-      </div>
-
-      <!-- Reglas Firestore -->
-      <details style="background:rgba(37,99,235,.05);border:1px solid rgba(37,99,235,.15);border-radius:10px;padding:.65rem .9rem;font-family:var(--fb);font-size:12px;">
-        <summary style="color:var(--blue3);font-weight:700;letter-spacing:.08em;text-transform:uppercase;cursor:pointer;">🔐 Reglas Firestore</summary>
-        <code style="display:block;background:var(--bg);color:#6ee7b7;padding:.5rem .6rem;border-radius:7px;font-size:11px;white-space:pre;overflow-x:auto;margin-top:.5rem;">match /profesores_registrados/{id} {
-  allow read: if request.auth != null;
-  // El propio profesor puede editar su perfil
-  allow update: if request.auth != null
-    && request.auth.uid == resource.data.uid;
-  // El admin puede crear, actualizar y eliminar cualquier doc
-  allow create, update, delete: if request.auth != null
-    && request.auth.token.email == "<a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="671402150012020e03135627000a060e0b4904080a">[email&#160;protected]</a>";
-}
-match /notificaciones_admin/{id} {
-  allow create: if request.auth != null;
-  allow read, update, delete: if false;
-}
-// Subcol de notificaciones de cada usuario
-match /users/{uid}/notificaciones/{nId} {
-  allow read, delete: if request.auth != null && request.auth.uid == uid;
-  allow create: if request.auth != null;
-}</code>
-      </details>
-
-    </div>
-
-  </div>
-</div>
-
-<!-- ════ MODAL ENVIAR MENSAJE ════ -->
 <div class="msg-modal-overlay hidden" id="msg-modal">
   <div class="msg-modal-card">
     <div class="msg-modal-hdr">
@@ -14763,8 +12365,7 @@ match /users/{uid}/notificaciones/{nId} {
       <button class="soporte-cat-btn active" data-cat="sugerencia"   onclick="soporteSelectCat(this)">💡 Sugerencia</button>
       <button class="soporte-cat-btn" data-cat="correccion"    onclick="soporteSelectCat(this)">✏️ Corrección</button>
       <button class="soporte-cat-btn" data-cat="error"         onclick="soporteSelectCat(this)">🐛 Error</button>
-      <button class="soporte-cat-btn" data-cat="quiero_staff"  onclick="soporteSelectCat(this)">🎓 Quiero ser del staff</button>
-      <button class="soporte-cat-btn" data-cat="otro"          onclick="soporteSelectCat(this)">💬 Otro</button>
+            <button class="soporte-cat-btn" data-cat="otro"          onclick="soporteSelectCat(this)">💬 Otro</button>
     </div>
     <textarea class="msg-textarea" id="soporte-textarea" placeholder="Describí tu mensaje aquí…" maxlength="500" oninput="g('soporte-char-count').textContent=this.value.length"></textarea>
     <div style="font-family:var(--fb);font-size:16px;color:var(--muted);text-align:right;margin-top:-.5rem">
@@ -14784,7 +12385,7 @@ match /users/{uid}/notificaciones/{nId} {
     <div class="confirm-title" id="confirm-title">ELIMINAR</div>
     <p class="confirm-msg" id="confirm-msg">¿Estás seguro?</p>
     <div class="confirm-actions">
-      <button class="confirm-yes" id="confirm-yes" onclick="confirmarAccion()">Sí, eliminar</button>
+      <button class="confirm-yes" id="confirm-yes" onclick="ejecutarConfirm()">Sí, eliminar</button>
       <button class="confirm-no" onclick="cerrarConfirm()">Cancelar</button>
     </div>
   </div>
@@ -14792,79 +12393,6 @@ match /users/{uid}/notificaciones/{nId} {
 
 
 <!-- ════ MODAL CREAR PROFESOR ════ -->
-<div class="prof-modal-overlay hidden" id="prof-modal">
-  <div class="prof-modal-card">
-    <div style="display:flex;align-items:center;justify-content:space-between">
-      <div class="prof-modal-title">
-        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#a78bfa" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
-        Nuevo Profesor
-      </div>
-      <button class="modal-close" onclick="cerrarModalCrearProfesor()">✕</button>
-    </div>
-    <div class="prof-modal-desc">
-      Ingresá el nombre del profesor. El sistema generará un perfil pendiente — el profesor podrá crear su cuenta usando ese nombre exacto.
-    </div>
-    <div>
-      <div class="prof-modal-lbl">Nombre del profesor</div>
-      <input class="prof-modal-inp" id="prof-nuevo-nombre" type="text" placeholder="Ej: Juan Pérez" maxlength="60" autocomplete="off">
-    </div>
-    <div>
-      <div class="prof-modal-lbl">Fecha de habilitación <span style="color:var(--muted);font-size:14px;text-transform:none;letter-spacing:0">(opcional)</span></div>
-      <input class="date-inp" id="prof-nuevo-fecha" type="date" style="font-size:18px;padding:.5rem .7rem">
-      <div style="font-family:var(--fb);font-size:16px;color:var(--muted);margin-top:.3rem;line-height:1.5">
-        Si dejás vacío, se habilita automáticamente cuando el profesor cree su cuenta.
-      </div>
-    </div>
-    <div class="prof-modal-err" id="prof-modal-err"></div>
-    <button class="btn-create-prof" id="prof-crear-btn" onclick="crearProfesorRegistrado()">
-      <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/><line x1="19" y1="8" x2="19" y2="14"/><line x1="22" y1="11" x2="16" y2="11"/></svg>
-      CREAR PERFIL DE PROFESOR
-    </button>
-    <button onclick="cerrarModalCrearProfesor()" style="width:100%;background:none;border:none;color:var(--muted);font-family:var(--fb);font-size:17px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;padding:.2rem;cursor:pointer">CANCELAR</button>
-  </div>
-</div>
-
-<!-- ════ MODAL REGISTRO PROFESOR (Auth) ════ -->
-<div class="prof-modal-overlay hidden" id="prof-reg-modal">
-  <div class="prof-modal-card">
-    <div style="display:flex;align-items:center;justify-content:space-between">
-      <div class="prof-modal-title">
-        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#a78bfa" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
-        Crear Cuenta
-      </div>
-      <button class="modal-close" onclick="cerrarRegistroProfesor()">✕</button>
-    </div>
-    <div class="prof-modal-desc" id="prof-reg-desc">
-      Completá tus datos para activar tu perfil de profesor.
-    </div>
-    <div>
-      <div class="prof-modal-lbl">Nombre registrado</div>
-      <input class="prof-modal-inp" id="prof-reg-nombre-confirm" type="text" placeholder="Tu nombre" style="background:rgba(124,58,237,.08);color:#a78bfa" readonly>
-    </div>
-    <div>
-      <div class="prof-modal-lbl">Email</div>
-      <input class="prof-modal-inp" id="prof-reg-email" type="email" placeholder="tu@email.com" autocomplete="email">
-    </div>
-    <div>
-      <div class="prof-modal-lbl">Contraseña</div>
-      <input class="prof-modal-inp" id="prof-reg-pass" type="password" placeholder="Tu contraseña de Fit Ladder" autocomplete="current-password">
-    </div>
-    <!-- Campo confirmar solo visible si es cuenta nueva -->
-    <div id="prof-reg-pass2-wrap">
-      <div class="prof-modal-lbl">Confirmar contraseña <span style="color:var(--muted);font-size:13px;font-weight:400;">(solo si es cuenta nueva)</span></div>
-      <input class="prof-modal-inp" id="prof-reg-pass2" type="password" placeholder="Repetí tu contraseña" autocomplete="new-password">
-    </div>
-    <div id="prof-reg-info" style="font-family:var(--fb);font-size:14px;color:var(--muted);background:var(--bg3);border:1px solid var(--border);border-radius:9px;padding:.55rem .8rem;line-height:1.5;display:none;">
-      💡 Si ya tenés cuenta en Fit Ladder, ingresá el mismo email y contraseña. Tu perfil de profesor quedará vinculado a tu cuenta existente.
-    </div>
-    <div class="prof-modal-err" id="prof-reg-err"></div>
-    <button class="btn-create-prof" id="prof-reg-btn" onclick="registrarProfesor()">
-      ✅ ACTIVAR MI PERFIL DE PROFESOR
-    </button>
-    <button onclick="cerrarRegistroProfesor()" style="width:100%;background:none;border:none;color:var(--muted);font-family:var(--fb);font-size:17px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;padding:.2rem;cursor:pointer">CANCELAR</button>
-  </div>
-</div>
-
 <!-- ════ MODAL ENVIAR A TODOS ════ -->
 <div class="msg-modal-overlay hidden" id="masivo-modal">
   <div class="msg-modal-card" style="max-width:520px;">
@@ -14879,7 +12407,7 @@ match /users/{uid}/notificaciones/{nId} {
     <textarea class="msg-textarea" id="masivo-textarea" placeholder="Escribí tu mensaje aquí…" style="min-height:160px;"></textarea>
     <button class="msg-send-btn" id="masivo-send-btn" onclick="enviarMasivo()">
       <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
-      ABRIR EN CORREO
+      ENVIAR A TODOS
     </button>
   </div>
 </div>
@@ -14932,7 +12460,7 @@ match /users/{uid}/notificaciones/{nId} {
       <p style="margin-bottom:.5rem;font-weight:700;color:var(--text);">¿Para qué los usamos?</p>
       <p style="margin-bottom:.7rem;">Exclusivamente para brindarte las funcionalidades de Fit Ladder. No usamos tus datos con fines publicitarios.</p>
       <p style="margin-bottom:.5rem;font-weight:700;color:var(--text);">¿Compartimos tus datos?</p>
-      <p style="margin-bottom:.7rem;">No vendemos ni cedemos tus datos a terceros. Solo los compartimos con tu profesor si vos lo solicitás explícitamente.</p>
+      <p style="margin-bottom:.7rem;">No vendemos ni cedemos tus datos a terceros. No compartimos tus datos con terceros.</p>
       <p style="margin-bottom:.5rem;font-weight:700;color:var(--text);">Almacenamiento</p>
       <p style="margin-bottom:.7rem;">Tus datos se almacenan en Firebase (Google Cloud), con cifrado en tránsito y en reposo.</p>
       <p style="margin-bottom:.5rem;font-weight:700;color:var(--text);">Tus derechos</p>
