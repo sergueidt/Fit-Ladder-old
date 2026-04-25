@@ -1,16 +1,99 @@
-/* Variables Globales */
+/* ============================================
+   Fit Ladder — Estilos Globales
+   ============================================ */
+
 :root {
-  --bg:    #080c14;
-  --bg2:   #0d1221;
-  --blue:  #2563eb;
-  --text:  #e8edf8;
-  --fd:    'Bebas Neue', sans-serif;
-  --fb:    'Barlow', sans-serif;
+  --bg:     #080c14;
+  --bg2:    #0d1221;
+  --bg3:    #131929;
+  --blue:   #2563eb;
+  --text:   #e8edf8;
+  --muted:  #6b7a99;
+  --border: #1e2d4a;
+  --fd:     'Bebas Neue', sans-serif;
+  --fb:     'Barlow', sans-serif;
 }
 
-/* Copia aquí el resto de tus clases como .drawer-nav, .modal-card, etc. */
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
 body {
   font-family: var(--fb);
   background: var(--bg);
   color: var(--text);
+  min-height: 100vh;
 }
+
+/* --- BOTONES --- */
+.btn-blue {
+  background: var(--blue);
+  color: #fff;
+  border: none;
+  font-family: var(--fb);
+  font-size: 1rem;
+  font-weight: 700;
+  letter-spacing: 1px;
+  cursor: pointer;
+  transition: opacity 0.2s;
+}
+.btn-blue:hover { opacity: 0.85; }
+
+.btn-secondary {
+  background: var(--bg3);
+  color: var(--text);
+  border: 1px solid var(--border);
+  font-family: var(--fb);
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  border-radius: 12px;
+  padding: 0.8rem;
+  transition: background 0.2s;
+}
+.btn-secondary:hover { background: var(--bg2); }
+
+/* --- INPUTS --- */
+.input-style {
+  display: block;
+  background: var(--bg3);
+  border: 1px solid var(--border);
+  padding: 0.8rem 1rem;
+  border-radius: 10px;
+  color: var(--text);
+  font-family: var(--fb);
+  font-size: 1rem;
+  outline: none;
+  transition: border-color 0.2s;
+}
+.input-style:focus { border-color: var(--blue); }
+
+/* --- MODALES --- */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.7);
+  z-index: 10000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1.5rem;
+  backdrop-filter: blur(4px);
+}
+
+.modal-card {
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 2rem;
+  width: 100%;
+}
+
+/* --- ANIMACIONES --- */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.fade-in { animation: fadeIn 0.3s ease forwards; }
