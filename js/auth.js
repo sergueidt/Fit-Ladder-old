@@ -6,17 +6,16 @@
 // --- ESTADO DE SESIÓN ---
 auth.onAuthStateChanged(async (user) => {
     if (user) {
-        console.log("Usuario autenticado:", user.uid);
-        // Aquí llamarás a la función para cargar datos del usuario desde Firestore
-        if (typeof cargarDatosUsuario === 'function') {
-            await cargarDatosUsuario(user.uid);
-        }
-        // Redirigir al dashboard si está en el login
-        ocultarLogin(); 
+        console.log("Sesión activa detectada.");
+        ocultarLogin();
+        await cargarDatosUsuario(user.uid);
     } else {
-        console.log("No hay sesión activa.");
+        console.log("No hay sesión. Manteniendo pantalla de login.");
         mostrarLogin();
     }
+}, (error) => {
+    console.error("Error de Firebase Auth:", error);
+    mostrarLogin();
 });
 
 // --- FUNCIÓN LOGIN ---
