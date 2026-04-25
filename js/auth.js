@@ -1,6 +1,6 @@
 /**
  * Fit Ladder - Módulo de Autenticación (auth.js)
- * Maneja Login, Registro y Estados de Sesión
+ * Maneja Login, Registro, Estados de Sesión e Invitado
  */
 
 // --- ESTADO DE SESIÓN ---
@@ -22,14 +22,14 @@ auth.onAuthStateChanged(async (user) => {
 async function iniciarSesion(email, pass) {
     const btn = document.getElementById('btn-login');
     const originalText = btn.innerText;
-    
+
     try {
         btn.innerText = "Cargando...";
         btn.disabled = true;
-        
+
         await auth.signInWithEmailAndPassword(email, pass);
         console.log("Inicio de sesión exitoso");
-        
+
     } catch (error) {
         console.error("Error login:", error);
         alert("Error: " + obtenerMensajeError(error.code));
@@ -39,18 +39,17 @@ async function iniciarSesion(email, pass) {
     }
 }
 
-// --- FUNCIÓN REGISTRO (Para el modelo SaaS) ---
+// --- FUNCIÓN REGISTRO ---
 async function registrarUsuario(email, pass, nombreCompleto) {
     try {
         const userCredential = await auth.createUserWithEmailAndPassword(email, pass);
         const user = userCredential.user;
 
-        // Crear el documento inicial en Firestore para los 50 usuarios
         await db.collection("usuarios").doc(user.uid).set({
             nombre: nombreCompleto,
             email: email,
             fechaRegistro: firebase.firestore.FieldValue.serverTimestamp(),
-            rol: "atleta", // Rol por defecto para el SaaS
+            rol: "atleta",
             nivel: 1,
             puntos: 0
         });
@@ -74,9 +73,51 @@ async function resetearPassword(email) {
 
 // --- CERRAR SESIÓN ---
 function cerrarSesion() {
+    // Limpiar sesión de invitado si existe
+    localStorage.removeItem('fitladder_invitado_exp');
+    localStorage.removeItem('fitladder_rol');
+
     auth.signOut().then(() => {
-        location.reload(); // Recarga para limpiar el estado de la app
+        location.reload();
     });
+}
+
+// --- ACCESO INVITADO (24H) ---
+function accesoInvitado() {
+    const ahora = new Date().getTime();
+    const expiracion = ahora + (24 * 60 * 60 * 1000); // 24h en ms
+
+    localStorage.setItem('fitladder_invitado_exp', expiracion);
+    localStorage.setItem('fitladder_rol', 'invitado');
+
+    ocultarLogin();
+    cargarModoInvitado();
+}
+
+// --- VERIFICAR SESIÓN INVITADO ---
+function verificarInvitado() {
+    const exp = localStorage.getItem('fitladder_invitado_exp');
+    if (exp) {
+        const ahora = new Date().getTime();
+        if (ahora < parseInt(exp)) {
+            return true; // Sesión válida
+        } else {
+            localStorage.clear(); // Expiró
+            return false;
+        }
+    }
+    return false;
+}
+
+// --- MODO INVITADO: carga datos genéricos ---
+function cargarModoInvitado() {
+    actualizarInterfazUsuario({ nombre: "Invitado Temporal", puntos: 0 });
+
+    // Banner de conversión (se inyecta en el app si existe el contenedor)
+    const banner = document.getElementById('banner-invitado');
+    if (banner) banner.style.display = 'flex';
+
+    console.log("Modo invitado activo.");
 }
 
 // --- TRADUCTOR DE ERRORES FIREBASE ---
@@ -91,8 +132,10 @@ function obtenerMensajeError(code) {
     }
 }
 
-// Hacer las funciones disponibles globalmente para los botones HTML (onclick)
+// Exponer funciones al window
 window.iniciarSesion = iniciarSesion;
 window.registrarUsuario = registrarUsuario;
 window.cerrarSesion = cerrarSesion;
 window.resetearPassword = resetearPassword;
+window.accesoInvitado = accesoInvitado;
+window.verificarInvitado = verificarInvitado;

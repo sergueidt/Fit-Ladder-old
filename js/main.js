@@ -1,11 +1,17 @@
 /**
  * Fit Ladder - Punto de Entrada Principal (main.js)
- * Orquestador de lógica de entrenamiento, cálculos y carga de datos
  */
 
 document.addEventListener('DOMContentLoaded', () => {
     console.log("Fit Ladder inicializado...");
-    // Inicializar tooltips o listeners globales si los tienes
+
+    // Verificar si hay sesión de invitado activa antes de esperar Firebase
+    if (verificarInvitado()) {
+        console.log("Sesión de invitado activa");
+        ocultarLogin();
+        cargarModoInvitado();
+    }
+    // Si no hay invitado, Firebase Auth toma el control desde auth.js
 });
 
 // --- CARGA DE DATOS DESDE FIRESTORE ---
@@ -23,10 +29,9 @@ async function cargarDatosUsuario(uid) {
 }
 
 function actualizarInterfazUsuario(data) {
-    // Actualiza nombres y estadísticas en el Dashboard
     const nombreElem = document.getElementById('user-name-display');
     if (nombreElem) nombreElem.innerText = data.nombre || "Atleta";
-    
+
     const puntosElem = document.getElementById('user-points');
     if (puntosElem) puntosElem.innerText = `${data.puntos || 0} PTS`;
 }
@@ -38,7 +43,6 @@ function calcular1RM() {
     const resultadoDiv = document.getElementById('rm-resultado');
 
     if (peso > 0 && reps > 0) {
-        // Fórmula de Epley (la que usas en tu HTML original)
         const rm = peso * (1 + (reps / 30));
         resultadoDiv.innerHTML = `
             <div class="rm-card">
@@ -57,7 +61,7 @@ let seconds = 0;
 
 function controlCronometro(accion) {
     const display = document.getElementById('timer-display');
-    
+
     if (accion === 'start') {
         if (timerInterval) return;
         timerInterval = setInterval(() => {
@@ -77,9 +81,8 @@ function controlCronometro(accion) {
     }
 }
 
-// --- MANEJO DE GRÁFICOS (Simple Wrapper) ---
+// --- MANEJO DE GRÁFICOS ---
 function renderizarGraficoProgreso(canvasId, labels, valores) {
-    // Aquí asumo que usas Chart.js como en tu archivo original
     const ctx = document.getElementById(canvasId);
     if (!ctx) return;
 
@@ -101,7 +104,8 @@ function renderizarGraficoProgreso(canvasId, labels, valores) {
     });
 }
 
-// Exponer funciones al window para los onclick del HTML
+// Exponer funciones al window
 window.calcular1RM = calcular1RM;
 window.controlCronometro = controlCronometro;
 window.cargarDatosUsuario = cargarDatosUsuario;
+window.actualizarInterfazUsuario = actualizarInterfazUsuario;
