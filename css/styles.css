@@ -97,3 +97,24 @@ body {
   to   { opacity: 1; transform: translateY(0); }
 }
 .fade-in { animation: fadeIn 0.3s ease forwards; }
+
+/* --- HERO BACKGROUND --- */
+#login-screen {
+  background-image: url('../assets/hero-bg.webp');
+  background-size: cover;
+  background-position: center top;
+  background-repeat: no-repeat;
+}
+
+#login-screen::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: rgba(8, 12, 20, 0.65);
+  z-index: 0;
+}
+
+#login-screen > * {
+  position: relative;
+  z-index: 1;
+}
