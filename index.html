@@ -16,65 +16,67 @@
     <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
 </head>
 <body>
-    <div id="app">
 
-        <!-- PANTALLA LOGIN -->
-        <div id="login-screen" style="display: flex; position: fixed; inset: 0; background: var(--bg); z-index: 9999; flex-direction: column; align-items: center; justify-content: center; padding: 2rem;">
+    <!-- PANTALLA LOGIN (fuera del #app) -->
+    <div id="login-screen" style="display: flex; position: fixed; inset: 0; background: var(--bg); z-index: 9999; flex-direction: column; align-items: center; justify-content: center; padding: 2rem;">
 
-            <div style="margin-bottom: 2rem; text-align: center;">
-                <h1 style="font-family: var(--fd); font-size: 3.5rem; color: var(--blue); margin: 0;">FIT LADDER</h1>
-                <p style="font-family: var(--fb); color: var(--muted); letter-spacing: 2px;">TU DIARIO DE PROGRESOS</p>
-            </div>
-
-            <div class="modal-card" style="width: 100%; max-width: 400px;">
-                <h2 style="font-family: var(--fd); font-size: 1.8rem; margin-bottom: 1.5rem;">Iniciar Sesión</h2>
-
-                <div style="margin-bottom: 1rem;">
-                    <label style="display: block; font-family: var(--fb); font-size: 0.8rem; color: var(--muted); margin-bottom: 0.5rem;">EMAIL</label>
-                    <input type="email" id="login-email" placeholder="ejemplo@correo.com" class="input-style" style="width: 100%;">
-                </div>
-
-                <div style="margin-bottom: 1.5rem;">
-                    <label style="display: block; font-family: var(--fb); font-size: 0.8rem; color: var(--muted); margin-bottom: 0.5rem;">CONTRASEÑA</label>
-                    <input type="password" id="login-pass" placeholder="••••••••" class="input-style" style="width: 100%;">
-                </div>
-
-                <button id="btn-login"
-                    onclick="iniciarSesion(document.getElementById('login-email').value, document.getElementById('login-pass').value)"
-                    class="btn-blue" style="width: 100%; padding: 1rem; border-radius: 12px;">
-                    ENTRAR
-                </button>
-
-                <div style="margin-top: 1.5rem; text-align: center; font-size: 0.9rem;">
-                    <span style="color: var(--muted);">¿No tienes cuenta?</span>
-                    <button onclick="openModal('modal-registro')" style="background: none; border: none; color: var(--blue); font-weight: 700; cursor: pointer; margin-left: 5px;">Regístrate</button>
-                </div>
-
-                <button onclick="resetearPassword(document.getElementById('login-email').value)"
-                    style="display: block; width: 100%; margin-top: 1rem; background: none; border: none; color: var(--muted); font-size: 0.8rem; cursor: pointer;">
-                    Olvidé mi contraseña
-                </button>
-            </div>
+        <div style="margin-bottom: 2rem; text-align: center;">
+            <h1 style="font-family: var(--fd); font-size: 3.5rem; color: var(--blue); margin: 0;">FIT LADDER</h1>
+            <p style="font-family: var(--fb); color: var(--muted); letter-spacing: 2px;">TU DIARIO DE PROGRESOS</p>
         </div>
 
-        <!-- MODAL REGISTRO -->
-        <div id="modal-registro" class="modal-overlay" style="display: none;">
-            <div class="modal-card" style="width: 90%; max-width: 400px;">
-                <h2 style="font-family: var(--fd); font-size: 1.8rem;">Crear Cuenta</h2>
-                <p style="color: var(--muted); font-size: 0.9rem; margin-bottom: 1.5rem;">Únete a los 50 atletas de Fit Ladder</p>
+        <div class="modal-card" style="width: 100%; max-width: 400px;">
+            <h2 style="font-family: var(--fd); font-size: 1.8rem; margin-bottom: 1.5rem;">Iniciar Sesión</h2>
 
-                <input type="text" id="reg-nombre" placeholder="Nombre completo" class="input-style" style="margin-bottom: 1rem; width: 100%;">
-                <input type="email" id="reg-email" placeholder="Correo electrónico" class="input-style" style="margin-bottom: 1rem; width: 100%;">
-                <input type="password" id="reg-pass" placeholder="Contraseña (mín. 6 caracteres)" class="input-style" style="margin-bottom: 1.5rem; width: 100%;">
+            <div style="margin-bottom: 1rem;">
+                <label style="display: block; font-family: var(--fb); font-size: 0.8rem; color: var(--muted); margin-bottom: 0.5rem;">EMAIL</label>
+                <input type="email" id="login-email" placeholder="ejemplo@correo.com" class="input-style" style="width: 100%;">
+            </div>
 
-                <div style="display: flex; gap: 1rem;">
-                    <button onclick="closeModal('modal-registro')" class="btn-secondary" style="flex: 1;">Cancelar</button>
-                    <button onclick="registrarUsuario(document.getElementById('reg-email').value, document.getElementById('reg-pass').value, document.getElementById('reg-nombre').value)"
-                        class="btn-blue" style="flex: 2; padding: 0.8rem; border-radius: 12px;">CREAR CUENTA</button>
-                </div>
+            <div style="margin-bottom: 1.5rem;">
+                <label style="display: block; font-family: var(--fb); font-size: 0.8rem; color: var(--muted); margin-bottom: 0.5rem;">CONTRASEÑA</label>
+                <input type="password" id="login-pass" placeholder="••••••••" class="input-style" style="width: 100%;">
+            </div>
+
+            <button id="btn-login"
+                onclick="iniciarSesion(document.getElementById('login-email').value, document.getElementById('login-pass').value)"
+                class="btn-blue" style="width: 100%; padding: 1rem; border-radius: 12px;">
+                ENTRAR
+            </button>
+
+            <div style="margin-top: 1.5rem; text-align: center; font-size: 0.9rem;">
+                <span style="color: var(--muted);">¿No tienes cuenta?</span>
+                <button onclick="openModal('modal-registro')" style="background: none; border: none; color: var(--blue); font-weight: 700; cursor: pointer; margin-left: 5px;">Regístrate</button>
+            </div>
+
+            <button onclick="resetearPassword(document.getElementById('login-email').value)"
+                style="display: block; width: 100%; margin-top: 1rem; background: none; border: none; color: var(--muted); font-size: 0.8rem; cursor: pointer;">
+                Olvidé mi contraseña
+            </button>
+        </div>
+    </div>
+
+    <!-- MODAL REGISTRO (fuera del #app) -->
+    <div id="modal-registro" class="modal-overlay" style="display: none;">
+        <div class="modal-card" style="width: 90%; max-width: 400px;">
+            <h2 style="font-family: var(--fd); font-size: 1.8rem;">Crear Cuenta</h2>
+            <p style="color: var(--muted); font-size: 0.9rem; margin-bottom: 1.5rem;">Únete a los 50 atletas de Fit Ladder</p>
+
+            <input type="text" id="reg-nombre" placeholder="Nombre completo" class="input-style" style="margin-bottom: 1rem; width: 100%;">
+            <input type="email" id="reg-email" placeholder="Correo electrónico" class="input-style" style="margin-bottom: 1rem; width: 100%;">
+            <input type="password" id="reg-pass" placeholder="Contraseña (mín. 6 caracteres)" class="input-style" style="margin-bottom: 1.5rem; width: 100%;">
+
+            <div style="display: flex; gap: 1rem;">
+                <button onclick="closeModal('modal-registro')" class="btn-secondary" style="flex: 1;">Cancelar</button>
+                <button onclick="registrarUsuario(document.getElementById('reg-email').value, document.getElementById('reg-pass').value, document.getElementById('reg-nombre').value)"
+                    class="btn-blue" style="flex: 2; padding: 0.8rem; border-radius: 12px;">CREAR CUENTA</button>
             </div>
         </div>
+    </div>
 
+    <!-- APP PRINCIPAL (oculta hasta autenticarse) -->
+    <div id="app" style="display: none;">
+        <!-- Dashboard y módulos irán aquí -->
     </div>
 
     <script src="./js/firebase-config.js"></script>
