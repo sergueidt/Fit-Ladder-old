@@ -10,7 +10,7 @@
   --text:   #e8edf8;
   --muted:  #6b7a99;
   --border: #1e2d4a;
-  --fs:     22px;         /* ← tamaño base global */
+  --fs:     22px;
   --fd:     'Bebas Neue', sans-serif;
   --fb:     'Barlow', sans-serif;
 }
@@ -22,42 +22,30 @@ body {
   background: var(--bg);
   color: var(--text);
   min-height: 100vh;
-  font-size: 22px;        /* ← añade esta línea */
+  font-size: var(--fs);
 }
 
 /* ============================================
    SISTEMA DE ICONOS (Lucide) — GLOBAL
-   Usar en toda la app, nunca emojis
    ============================================ */
 
-/* Icono dentro de input */
-.input-wrapper {
-  position: relative;
-}
+.input-wrapper { position: relative; }
 
 .input-icon {
   position: absolute;
   left: 14px;
   top: 50%;
   transform: translateY(-50%);
-  width: 18px;
-  height: 18px;
+  width: 20px;
+  height: 20px;
   color: var(--muted);
   opacity: 0.5;
   pointer-events: none;
 }
 
-/* Icono en botones — alineación */
-.btn-icon {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-}
-
-/* Icono de acción con fondo (estilo GOWOD) */
 .icon-box {
-  width: 52px;
-  height: 52px;
+  width: 56px;
+  height: 56px;
   background: var(--bg3);
   border: 1px solid var(--border);
   border-radius: 14px;
@@ -68,8 +56,8 @@ body {
 }
 
 .icon-box svg {
-  width: 24px;
-  height: 24px;
+  width: 26px;
+  height: 26px;
   stroke-width: 1.75;
 }
 
@@ -79,7 +67,7 @@ body {
 
 .input-label {
   font-family: 'Barlow', sans-serif;
-  font-size: 11px;
+  font-size: 13px;
   font-weight: 900;
   color: var(--muted);
   margin-bottom: 8px;
@@ -94,20 +82,15 @@ body {
   border-radius: 12px;
   color: var(--text);
   font-family: 'Barlow', sans-serif;
-  font-size: 15px;
-  padding: 14px 14px 14px 42px;
+  font-size: 18px;
+  padding: 15px 15px 15px 44px;
   outline: none;
   transition: border-color 0.3s ease;
   box-sizing: border-box;
 }
 
-.fl-input:focus {
-  border-color: var(--blue);
-}
-
-.fl-input-icon-right {
-  padding-right: 42px;
-}
+.fl-input:focus { border-color: var(--blue); }
+.fl-input-icon-right { padding-right: 44px; }
 
 /* ============================================
    BOTONES
@@ -120,9 +103,9 @@ body {
   border: none;
   border-radius: 12px;
   font-family: 'Barlow', sans-serif;
-  font-size: 15px;
+  font-size: 18px;
   font-weight: 900;
-  padding: 16px;
+  padding: 17px;
   cursor: pointer;
   letter-spacing: 1px;
   box-shadow: 0 10px 20px rgba(37, 99, 235, 0.25);
@@ -133,7 +116,7 @@ body {
   transition: opacity 0.2s ease;
 }
 
-.btn-primary:hover { opacity: 0.88; }
+.btn-primary:hover    { opacity: 0.88; }
 .btn-primary:disabled { opacity: 0.5; cursor: not-allowed; }
 
 .btn-ghost {
@@ -143,9 +126,9 @@ body {
   border: 1px solid var(--border);
   border-radius: 12px;
   font-family: 'Barlow', sans-serif;
-  font-size: 13px;
+  font-size: 16px;
   font-weight: 700;
-  padding: 14px;
+  padding: 15px;
   cursor: pointer;
   display: flex;
   align-items: center;
@@ -162,7 +145,7 @@ body {
   color: var(--blue);
   font-family: 'Barlow', sans-serif;
   font-weight: 900;
-  font-size: 13px;
+  font-size: 15px;
   cursor: pointer;
   padding: 0;
 }
@@ -186,11 +169,11 @@ body {
   color: var(--text);
   border: 1px solid var(--border);
   font-family: var(--fb);
-  font-size: 1rem;
+  font-size: 18px;
   font-weight: 600;
   cursor: pointer;
   border-radius: 12px;
-  padding: 0.8rem;
+  padding: 0.9rem;
   transition: background 0.2s;
   display: flex;
   align-items: center;
