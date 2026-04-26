@@ -9,22 +9,24 @@
     <link rel="apple-touch-icon" id="apple-icon">
 
     <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Barlow:wght@400;600;700;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://unpkg.com/lucide-static@latest/font/lucide.css">
     <link rel="stylesheet" href="./css/styles.css">
 
     <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
 </head>
 <body>
 
-    <!-- PANTALLA LOGIN (fuera del #app) -->
+    <!-- PANTALLA LOGIN -->
     <div id="login-screen" style="display: flex; position: fixed; inset: 0; z-index: 9999; flex-direction: column; align-items: center; justify-content: center; padding: 20px; overflow-y: auto;">
 
         <!-- LOGO Y TÍTULO -->
         <div style="text-align: center; margin-bottom: 28px;">
             <div style="width: 80px; height: 80px; margin: 0 auto 14px;">
-    <img src="./assets/logo.webp" alt="Fit Ladder Logo"
-        style="width: 100%; height: 100%; border-radius: 50%; object-fit: cover;">
+                <img src="./assets/logo.webp" alt="Fit Ladder Logo"
+                    style="width: 100%; height: 100%; border-radius: 50%; object-fit: cover;">
             </div>
             <h1 style="font-family: 'Barlow', sans-serif; font-size: 36px; font-weight: 900; margin: 0; letter-spacing: -1px;">
                 <span style="color: var(--text);">FIT</span><span style="color: var(--blue);">LADDER</span>
@@ -32,7 +34,7 @@
             <p style="font-family: 'Barlow', sans-serif; font-weight: 700; font-size: 11px; letter-spacing: 4px; color: var(--muted); margin-top: 6px;">TU DIARIO DE PROGRESOS</p>
         </div>
 
-        <!-- TOGGLE INGRESAR / CREAR CUENTA -->
+        <!-- TOGGLE -->
         <div style="width: 100%; max-width: 360px; background: var(--bg2); border: 1px solid var(--border); border-radius: 14px; padding: 4px; display: flex; margin-bottom: 24px;">
             <button id="tab-login" onclick="switchAuthTab('login')"
                 style="flex: 1; padding: 12px; border: none; border-radius: 10px; font-family: 'Barlow', sans-serif; font-size: 13px; font-weight: 900; letter-spacing: 1px; cursor: pointer; transition: all 0.25s ease; background: var(--blue); color: #fff;">
@@ -48,50 +50,49 @@
         <div id="form-login" style="width: 100%; max-width: 360px;">
 
             <div style="margin-bottom: 14px;">
-                <div style="font-family: 'Barlow', sans-serif; font-size: 11px; font-weight: 900; color: var(--muted); margin-bottom: 8px; letter-spacing: 1px; text-transform: uppercase;">Correo Electrónico</div>
-                <div style="position: relative;">
-                    <span style="position: absolute; left: 14px; top: 50%; transform: translateY(-50%); opacity: 0.4; font-size: 15px;">✉</span>
-                    <input id="login-email" type="email" placeholder="tu@email.com"
-                        style="width: 100%; background: var(--bg2); border: 1px solid var(--border); border-radius: 12px; color: var(--text); font-family: 'Barlow', sans-serif; font-size: 15px; padding: 14px 14px 14px 38px; outline: none; transition: border 0.3s ease; box-sizing: border-box;">
+                <div class="input-label">Correo Electrónico</div>
+                <div class="input-wrapper">
+                    <i data-lucide="mail" class="input-icon"></i>
+                    <input id="login-email" type="email" placeholder="tu@email.com" class="fl-input">
                 </div>
             </div>
 
             <div style="margin-bottom: 8px;">
-                <div style="font-family: 'Barlow', sans-serif; font-size: 11px; font-weight: 900; color: var(--muted); margin-bottom: 8px; letter-spacing: 1px; text-transform: uppercase;">Contraseña</div>
-                <div style="position: relative;">
-                    <span style="position: absolute; left: 14px; top: 50%; transform: translateY(-50%); opacity: 0.4; font-size: 15px;">🔒</span>
-                    <input id="login-pass" type="password" placeholder="••••••••"
-                        style="width: 100%; background: var(--bg2); border: 1px solid var(--border); border-radius: 12px; color: var(--text); font-family: 'Barlow', sans-serif; font-size: 15px; padding: 14px 42px 14px 38px; outline: none; box-sizing: border-box;">
-                    <button onclick="togglePassword('login-pass', this)" style="position: absolute; right: 14px; top: 50%; transform: translateY(-50%); background: none; border: none; color: var(--muted); cursor: pointer; font-size: 16px; padding: 0;">👁</button>
+                <div class="input-label">Contraseña</div>
+                <div class="input-wrapper">
+                    <i data-lucide="lock" class="input-icon"></i>
+                    <input id="login-pass" type="password" placeholder="••••••••" class="fl-input fl-input-icon-right">
+                    <button onclick="togglePassword('login-pass', this)" class="btn-eye">
+                        <i data-lucide="eye" style="width:18px;height:18px;"></i>
+                    </button>
                 </div>
             </div>
 
             <div style="text-align: right; margin-bottom: 22px;">
-                <button onclick="resetearPassword(document.getElementById('login-email').value)"
-                    style="background: none; border: none; color: var(--blue); font-family: 'Barlow', sans-serif; font-size: 12px; font-weight: 700; cursor: pointer;">
+                <button onclick="resetearPassword(document.getElementById('login-email').value)" class="btn-link">
                     ¿Olvidaste tu contraseña?
                 </button>
             </div>
 
-            <button id="btn-login" onclick="iniciarSesion(document.getElementById('login-email').value, document.getElementById('login-pass').value)"
-                style="width: 100%; background: var(--blue); color: #fff; border: none; border-radius: 12px; font-family: 'Barlow', sans-serif; font-size: 15px; font-weight: 900; padding: 16px; cursor: pointer; letter-spacing: 1px; box-shadow: 0 10px 20px rgba(37,99,235,0.25); margin-bottom: 12px;">
-                🔑 INGRESAR
+            <button id="btn-login" onclick="iniciarSesion(document.getElementById('login-email').value, document.getElementById('login-pass').value)" class="btn-primary" style="margin-bottom: 12px;">
+                <i data-lucide="key-round" style="width:18px;height:18px;"></i>
+                INGRESAR
             </button>
 
-            <button onclick="accesoInvitado()"
-                style="width: 100%; background: rgba(255,255,255,0.04); color: var(--muted); border: 1px solid var(--border); border-radius: 12px; font-family: 'Barlow', sans-serif; font-size: 13px; font-weight: 700; padding: 14px; cursor: pointer; margin-bottom: 20px;">
-                👁 EXPLORAR COMO INVITADO · 24H
+            <button onclick="accesoInvitado()" class="btn-ghost" style="margin-bottom: 20px;">
+                <i data-lucide="eye" style="width:16px;height:16px;"></i>
+                EXPLORAR COMO INVITADO · 24H
             </button>
 
             <p style="text-align: center; font-family: 'Barlow', sans-serif; font-size: 13px; color: var(--muted); margin-bottom: 16px;">
                 ¿No tenés cuenta?
-                <button onclick="switchAuthTab('registro')" style="background: none; border: none; color: var(--blue); font-weight: 900; font-size: 13px; cursor: pointer;">Creá una gratis</button>
+                <button onclick="switchAuthTab('registro')" class="btn-link">Creá una gratis</button>
             </p>
 
             <div style="text-align: center; border-top: 1px solid var(--border); padding-top: 16px;">
-                <button onclick="alert('Contacta a tu entrenador para acceder')"
-                    style="background: none; border: none; color: var(--blue); font-family: 'Barlow', sans-serif; font-size: 13px; font-weight: 700; cursor: pointer; opacity: 0.8;">
-                    🎓 Soy profesor registrado
+                <button onclick="alert('Contacta a tu entrenador para acceder')" class="btn-link" style="display:inline-flex;align-items:center;gap:6px;">
+                    <i data-lucide="graduation-cap" style="width:15px;height:15px;"></i>
+                    Soy profesor registrado
                 </button>
             </div>
         </div>
@@ -100,67 +101,66 @@
         <div id="form-registro" style="width: 100%; max-width: 360px; display: none;">
 
             <div style="margin-bottom: 14px;">
-                <div style="font-family: 'Barlow', sans-serif; font-size: 11px; font-weight: 900; color: var(--muted); margin-bottom: 8px; letter-spacing: 1px; text-transform: uppercase;">Nombre Completo</div>
-                <div style="position: relative;">
-                    <span style="position: absolute; left: 14px; top: 50%; transform: translateY(-50%); opacity: 0.4; font-size: 15px;">👤</span>
-                    <input id="reg-nombre" type="text" placeholder="Tu nombre y apellido"
-                        style="width: 100%; background: var(--bg2); border: 1px solid var(--border); border-radius: 12px; color: var(--text); font-family: 'Barlow', sans-serif; font-size: 15px; padding: 14px 14px 14px 38px; outline: none; box-sizing: border-box;">
+                <div class="input-label">Nombre Completo</div>
+                <div class="input-wrapper">
+                    <i data-lucide="user" class="input-icon"></i>
+                    <input id="reg-nombre" type="text" placeholder="Tu nombre y apellido" class="fl-input">
                 </div>
             </div>
 
             <div style="margin-bottom: 14px;">
-                <div style="font-family: 'Barlow', sans-serif; font-size: 11px; font-weight: 900; color: var(--muted); margin-bottom: 8px; letter-spacing: 1px; text-transform: uppercase;">Correo Electrónico</div>
-                <div style="position: relative;">
-                    <span style="position: absolute; left: 14px; top: 50%; transform: translateY(-50%); opacity: 0.4; font-size: 15px;">✉</span>
-                    <input id="reg-email" type="email" placeholder="tu@email.com"
-                        style="width: 100%; background: var(--bg2); border: 1px solid var(--border); border-radius: 12px; color: var(--text); font-family: 'Barlow', sans-serif; font-size: 15px; padding: 14px 14px 14px 38px; outline: none; box-sizing: border-box;">
+                <div class="input-label">Correo Electrónico</div>
+                <div class="input-wrapper">
+                    <i data-lucide="mail" class="input-icon"></i>
+                    <input id="reg-email" type="email" placeholder="tu@email.com" class="fl-input">
                 </div>
             </div>
 
             <div style="margin-bottom: 14px;">
-                <div style="font-family: 'Barlow', sans-serif; font-size: 11px; font-weight: 900; color: var(--muted); margin-bottom: 8px; letter-spacing: 1px; text-transform: uppercase;">Contraseña</div>
-                <div style="position: relative;">
-                    <span style="position: absolute; left: 14px; top: 50%; transform: translateY(-50%); opacity: 0.4; font-size: 15px;">🔒</span>
-                    <input id="reg-pass" type="password" placeholder="Mínimo 6 caracteres"
-                        style="width: 100%; background: var(--bg2); border: 1px solid var(--border); border-radius: 12px; color: var(--text); font-family: 'Barlow', sans-serif; font-size: 15px; padding: 14px 42px 14px 38px; outline: none; box-sizing: border-box;">
-                    <button onclick="togglePassword('reg-pass', this)" style="position: absolute; right: 14px; top: 50%; transform: translateY(-50%); background: none; border: none; color: var(--muted); cursor: pointer; font-size: 16px; padding: 0;">👁</button>
+                <div class="input-label">Contraseña</div>
+                <div class="input-wrapper">
+                    <i data-lucide="lock" class="input-icon"></i>
+                    <input id="reg-pass" type="password" placeholder="Mínimo 6 caracteres" class="fl-input fl-input-icon-right">
+                    <button onclick="togglePassword('reg-pass', this)" class="btn-eye">
+                        <i data-lucide="eye" style="width:18px;height:18px;"></i>
+                    </button>
                 </div>
             </div>
 
             <div style="margin-bottom: 20px;">
-                <div style="font-family: 'Barlow', sans-serif; font-size: 11px; font-weight: 900; color: var(--muted); margin-bottom: 8px; letter-spacing: 1px; text-transform: uppercase;">Confirmar Contraseña</div>
-                <div style="position: relative;">
-                    <span style="position: absolute; left: 14px; top: 50%; transform: translateY(-50%); opacity: 0.4; font-size: 15px;">🛡</span>
-                    <input id="reg-pass-confirm" type="password" placeholder="Repetí tu contraseña"
-                        style="width: 100%; background: var(--bg2); border: 1px solid var(--border); border-radius: 12px; color: var(--text); font-family: 'Barlow', sans-serif; font-size: 15px; padding: 14px 42px 14px 38px; outline: none; box-sizing: border-box;">
-                    <button onclick="togglePassword('reg-pass-confirm', this)" style="position: absolute; right: 14px; top: 50%; transform: translateY(-50%); background: none; border: none; color: var(--muted); cursor: pointer; font-size: 16px; padding: 0;">👁</button>
+                <div class="input-label">Confirmar Contraseña</div>
+                <div class="input-wrapper">
+                    <i data-lucide="shield-check" class="input-icon"></i>
+                    <input id="reg-pass-confirm" type="password" placeholder="Repetí tu contraseña" class="fl-input fl-input-icon-right">
+                    <button onclick="togglePassword('reg-pass-confirm', this)" class="btn-eye">
+                        <i data-lucide="eye" style="width:18px;height:18px;"></i>
+                    </button>
                 </div>
             </div>
 
-            <!-- CHECKBOX TÉRMINOS -->
             <label style="display: flex; align-items: flex-start; gap: 12px; background: var(--bg2); border: 1px solid var(--border); border-radius: 12px; padding: 14px; margin-bottom: 20px; cursor: pointer;">
                 <input id="chk-terminos" type="checkbox" style="margin-top: 2px; accent-color: var(--blue); width: 16px; height: 16px; flex-shrink: 0;">
                 <span style="font-family: 'Barlow', sans-serif; font-size: 12px; color: var(--muted); line-height: 1.5;">
                     Leí y acepto los <a href="#" style="color: var(--blue); font-weight: 700;">Términos y Condiciones</a> y la
                     <a href="#" style="color: var(--blue); font-weight: 700;">Política de Privacidad</a>.
-                    Entiendo que mis datos de entrenamiento serán almacenados de forma segura.
+                    Entiendo que mis datos serán almacenados de forma segura.
                 </span>
             </label>
 
-            <button onclick="validarYRegistrar()"
-                style="width: 100%; background: var(--blue); color: #fff; border: none; border-radius: 12px; font-family: 'Barlow', sans-serif; font-size: 15px; font-weight: 900; padding: 16px; cursor: pointer; letter-spacing: 1px; box-shadow: 0 10px 20px rgba(37,99,235,0.25); margin-bottom: 16px;">
-                👤 CREAR CUENTA GRATIS
+            <button onclick="validarYRegistrar()" class="btn-primary" style="margin-bottom: 16px;">
+                <i data-lucide="user-plus" style="width:18px;height:18px;"></i>
+                CREAR CUENTA GRATIS
             </button>
 
             <p style="text-align: center; font-family: 'Barlow', sans-serif; font-size: 13px; color: var(--muted);">
                 ¿Ya tenés cuenta?
-                <button onclick="switchAuthTab('login')" style="background: none; border: none; color: var(--blue); font-weight: 900; font-size: 13px; cursor: pointer;">Iniciá sesión</button>
+                <button onclick="switchAuthTab('login')" class="btn-link">Iniciá sesión</button>
             </p>
         </div>
 
     </div>
 
-    <!-- APP PRINCIPAL (oculta hasta autenticarse) -->
+    <!-- APP PRINCIPAL -->
     <div id="app" style="display: none;">
         <!-- Dashboard y módulos irán aquí -->
     </div>
@@ -171,6 +171,9 @@
     <script src="./js/main.js"></script>
 
     <script>
+        // Inicializar Lucide Icons
+        lucide.createIcons();
+
         function switchAuthTab(tab) {
             const formLogin    = document.getElementById('form-login');
             const formRegistro = document.getElementById('form-registro');
@@ -180,26 +183,22 @@
             const currentForm = tab === 'login' ? formRegistro : formLogin;
             const nextForm    = tab === 'login' ? formLogin    : formRegistro;
 
-            // Salida del form actual
             currentForm.style.transition = 'opacity 0.2s ease, transform 0.2s ease';
             currentForm.style.opacity    = '0';
             currentForm.style.transform  = tab === 'login' ? 'translateX(30px)' : 'translateX(-30px)';
 
             setTimeout(() => {
                 currentForm.style.display = 'none';
-
-                // Entrada del siguiente form
-                nextForm.style.display   = 'block';
-                nextForm.style.opacity   = '0';
-                nextForm.style.transform = tab === 'login' ? 'translateX(-30px)' : 'translateX(30px)';
-                nextForm.offsetHeight; // forzar reflow
-
+                nextForm.style.display    = 'block';
+                nextForm.style.opacity    = '0';
+                nextForm.style.transform  = tab === 'login' ? 'translateX(-30px)' : 'translateX(30px)';
+                nextForm.offsetHeight;
                 nextForm.style.transition = 'opacity 0.25s ease, transform 0.25s ease';
                 nextForm.style.opacity    = '1';
                 nextForm.style.transform  = 'translateX(0)';
+                lucide.createIcons(); // Re-inicializar icons en el nuevo form
             }, 200);
 
-            // Actualizar tabs
             if (tab === 'login') {
                 tabLogin.style.background    = 'var(--blue)';
                 tabLogin.style.color         = '#fff';
@@ -215,13 +214,12 @@
 
         function togglePassword(inputId, btn) {
             const input = document.getElementById(inputId);
-            if (input.type === 'password') {
-                input.type   = 'text';
-                btn.innerText = '🙈';
-            } else {
-                input.type   = 'password';
-                btn.innerText = '👁';
-            }
+            const isPassword = input.type === 'password';
+            input.type = isPassword ? 'text' : 'password';
+            btn.innerHTML = isPassword
+                ? '<i data-lucide="eye-off" style="width:18px;height:18px;"></i>'
+                : '<i data-lucide="eye" style="width:18px;height:18px;"></i>';
+            lucide.createIcons();
         }
 
         function validarYRegistrar() {
@@ -239,8 +237,8 @@
             registrarUsuario(email, pass, nombre);
         }
 
-        window.switchAuthTab    = switchAuthTab;
-        window.togglePassword   = togglePassword;
+        window.switchAuthTab     = switchAuthTab;
+        window.togglePassword    = togglePassword;
         window.validarYRegistrar = validarYRegistrar;
     </script>
 </body>
