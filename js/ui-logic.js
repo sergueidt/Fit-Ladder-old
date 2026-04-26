@@ -3,18 +3,11 @@
  */
 
 // --- DRAWER ---
-function toggleDrawer() {
+function abrirDrawer() {
     const drawer  = document.getElementById('drawer-nav');
     const overlay = document.getElementById('drawer-overlay');
-    const isOpen  = drawer.classList.contains('open');
-
-    if (isOpen) {
-        drawer.classList.remove('open');
-        overlay.classList.remove('active');
-    } else {
-        drawer.classList.add('open');
-        overlay.classList.add('active');
-    }
+    if (drawer)  drawer.classList.add('open');
+    if (overlay) overlay.classList.add('active');
 }
 
 function cerrarDrawer() {
@@ -24,15 +17,26 @@ function cerrarDrawer() {
     if (overlay) overlay.classList.remove('active');
 }
 
+function toggleDrawer() {
+    const drawer = document.getElementById('drawer-nav');
+    if (drawer && drawer.classList.contains('open')) {
+        cerrarDrawer();
+    } else {
+        abrirDrawer();
+    }
+}
+
 // --- CAMBIO DE SECCIONES ---
 function switchTab(tabId) {
     console.log("Cambiando a:", tabId);
 
+    // Ocultar todas las secciones
     document.querySelectorAll('.tab-content').forEach(section => {
         section.style.display = 'none';
         section.classList.remove('active');
     });
 
+    // Mostrar la sección seleccionada
     const target = document.getElementById(tabId);
     if (target) {
         target.style.display = 'block';
@@ -52,9 +56,8 @@ function switchTab(tabId) {
     const activeDrawer = document.querySelector(`.drawer-item[onclick*="${tabId}"]`);
     if (activeDrawer) activeDrawer.classList.add('active');
 
-    // Cerrar drawer si está abierto
-    const drawer = document.getElementById('drawer-nav');
-    if (drawer && drawer.classList.contains('open')) toggleDrawer();
+    // Cerrar drawer siempre al navegar
+    cerrarDrawer();
 
     if (window.navigator && window.navigator.vibrate) window.navigator.vibrate(10);
 }
@@ -116,11 +119,13 @@ function closeModal(modalId) {
 // Cerrar drawer al clicar overlay
 document.addEventListener('DOMContentLoaded', () => {
     const overlay = document.getElementById('drawer-overlay');
-    if (overlay) overlay.addEventListener('click', toggleDrawer);
+    if (overlay) overlay.addEventListener('click', cerrarDrawer);
 });
 
 // Exponer globalmente
 window.toggleDrawer  = toggleDrawer;
+window.abrirDrawer   = abrirDrawer;
+window.cerrarDrawer  = cerrarDrawer;
 window.switchTab     = switchTab;
 window.openModal     = openModal;
 window.closeModal    = closeModal;
