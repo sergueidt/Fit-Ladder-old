@@ -7,10 +7,8 @@
     <meta name="theme-color" content="#2563eb">
     <link id="pwa-manifest" rel="manifest">
     <link rel="apple-touch-icon" id="apple-icon">
-
     <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Barlow:wght@400;600;700;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="./css/styles.css">
-
     <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
@@ -18,226 +16,465 @@
 </head>
 <body>
 
-    <!-- PANTALLA LOGIN -->
-    <div id="login-screen" style="display: flex; position: fixed; inset: 0; z-index: 9999; flex-direction: column; align-items: center; justify-content: center; padding: 20px; overflow-y: auto;">
+<!-- ========== PANTALLA LOGIN ========== -->
+<div id="login-screen" style="display: flex; position: fixed; inset: 0; z-index: 9999; flex-direction: column; align-items: center; justify-content: center; padding: 20px; overflow-y: auto;">
 
-        <!-- LOGO Y TÍTULO -->
-        <div style="text-align: center; margin-bottom: 28px;">
-            <div style="width: 80px; height: 80px; margin: 0 auto 14px;">
-                <img src="./assets/logo.webp" alt="Fit Ladder Logo"
-                    style="width: 100%; height: 100%; border-radius: 50%; object-fit: cover;">
-            </div>
-            <h1 style="font-family: 'Barlow', sans-serif; font-size: 42px; font-weight: 900; margin: 0; letter-spacing: -1px;">
-                <span style="color: var(--text);">FIT</span><span style="color: var(--blue);">LADDER</span>
-            </h1>
-            <p style="font-family: 'Barlow', sans-serif; font-weight: 700; font-size: 13px; letter-spacing: 4px; color: var(--muted); margin-top: 6px;">TU DIARIO DE PROGRESOS</p>
+    <div style="text-align: center; margin-bottom: 28px;">
+        <div style="width: 80px; height: 80px; margin: 0 auto 14px;">
+            <img src="./assets/logo.webp" alt="Fit Ladder Logo" style="width:100%;height:100%;border-radius:50%;object-fit:cover;">
         </div>
+        <h1 style="font-family:'Barlow',sans-serif;font-size:42px;font-weight:900;margin:0;letter-spacing:-1px;">
+            <span style="color:var(--text);">FIT</span><span style="color:var(--blue);">LADDER</span>
+        </h1>
+        <p style="font-family:'Barlow',sans-serif;font-weight:700;font-size:13px;letter-spacing:4px;color:var(--muted);margin-top:6px;">TU DIARIO DE PROGRESOS</p>
+    </div>
 
-        <!-- TOGGLE -->
-        <div style="width: 100%; max-width: 380px; background: var(--bg2); border: 1px solid var(--border); border-radius: 14px; padding: 4px; display: flex; margin-bottom: 24px;">
-            <button id="tab-login" onclick="switchAuthTab('login')"
-                style="flex: 1; padding: 13px; border: none; border-radius: 10px; font-family: 'Barlow', sans-serif; font-size: 15px; font-weight: 900; letter-spacing: 1px; cursor: pointer; transition: all 0.25s ease; background: var(--blue); color: #fff;">
-                INGRESAR
-            </button>
-            <button id="tab-registro" onclick="switchAuthTab('registro')"
-                style="flex: 1; padding: 13px; border: none; border-radius: 10px; font-family: 'Barlow', sans-serif; font-size: 15px; font-weight: 900; letter-spacing: 1px; cursor: pointer; transition: all 0.25s ease; background: transparent; color: var(--muted);">
-                CREAR CUENTA
-            </button>
-        </div>
+    <div style="width:100%;max-width:380px;background:var(--bg2);border:1px solid var(--border);border-radius:14px;padding:4px;display:flex;margin-bottom:24px;">
+        <button id="tab-login" onclick="switchAuthTab('login')" style="flex:1;padding:13px;border:none;border-radius:10px;font-family:'Barlow',sans-serif;font-size:15px;font-weight:900;letter-spacing:1px;cursor:pointer;transition:all 0.25s ease;background:var(--blue);color:#fff;">INGRESAR</button>
+        <button id="tab-registro" onclick="switchAuthTab('registro')" style="flex:1;padding:13px;border:none;border-radius:10px;font-family:'Barlow',sans-serif;font-size:15px;font-weight:900;letter-spacing:1px;cursor:pointer;transition:all 0.25s ease;background:transparent;color:var(--muted);">CREAR CUENTA</button>
+    </div>
 
-        <!-- FORMULARIO LOGIN -->
-        <div id="form-login" style="width: 100%; max-width: 380px;">
-
-            <div style="margin-bottom: 14px;">
-                <div class="input-label">Correo Electrónico</div>
-                <div class="input-wrapper">
-                    <i data-lucide="mail" class="input-icon"></i>
-                    <input id="login-email" type="email" placeholder="tu@email.com" class="fl-input">
-                </div>
-            </div>
-
-            <div style="margin-bottom: 8px;">
-                <div class="input-label">Contraseña</div>
-                <div class="input-wrapper">
-                    <i data-lucide="lock" class="input-icon"></i>
-                    <input id="login-pass" type="password" placeholder="••••••••" class="fl-input fl-input-icon-right">
-                    <button onclick="togglePassword('login-pass', this)" class="btn-eye">
-                        <i data-lucide="eye" style="width:20px;height:20px;"></i>
-                    </button>
-                </div>
-            </div>
-
-            <div style="text-align: right; margin-bottom: 22px;">
-                <button onclick="resetearPassword(document.getElementById('login-email').value)" class="btn-link">
-                    ¿Olvidaste tu contraseña?
-                </button>
-            </div>
-
-            <button id="btn-login" onclick="iniciarSesion(document.getElementById('login-email').value, document.getElementById('login-pass').value)" class="btn-primary" style="margin-bottom: 12px;">
-                <i data-lucide="key-round" style="width:20px;height:20px;"></i>
-                INGRESAR
-            </button>
-
-            <button onclick="accesoInvitado()" class="btn-ghost" style="margin-bottom: 20px;">
-                <i data-lucide="eye" style="width:18px;height:18px;"></i>
-                EXPLORAR COMO INVITADO · 24H
-            </button>
-
-            <p style="text-align: center; font-family: 'Barlow', sans-serif; font-size: 15px; color: var(--muted); margin-bottom: 16px;">
-                ¿No tenés cuenta?
-                <button onclick="switchAuthTab('registro')" class="btn-link">Creá una gratis</button>
-            </p>
-
-            <div style="text-align: center; border-top: 1px solid var(--border); padding-top: 16px;">
-                <button onclick="alert('Contacta a tu entrenador para acceder')" class="btn-link" style="display:inline-flex;align-items:center;gap:6px;">
-                    <i data-lucide="graduation-cap" style="width:17px;height:17px;"></i>
-                    Soy profesor registrado
-                </button>
+    <!-- FORM LOGIN -->
+    <div id="form-login" style="width:100%;max-width:380px;">
+        <div style="margin-bottom:14px;">
+            <div class="input-label">Correo Electrónico</div>
+            <div class="input-wrapper">
+                <i data-lucide="mail" class="input-icon"></i>
+                <input id="login-email" type="email" placeholder="tu@email.com" class="fl-input">
             </div>
         </div>
-
-        <!-- FORMULARIO REGISTRO -->
-        <div id="form-registro" style="width: 100%; max-width: 380px; display: none;">
-
-            <div style="margin-bottom: 14px;">
-                <div class="input-label">Nombre Completo</div>
-                <div class="input-wrapper">
-                    <i data-lucide="user" class="input-icon"></i>
-                    <input id="reg-nombre" type="text" placeholder="Tu nombre y apellido" class="fl-input">
-                </div>
+        <div style="margin-bottom:8px;">
+            <div class="input-label">Contraseña</div>
+            <div class="input-wrapper">
+                <i data-lucide="lock" class="input-icon"></i>
+                <input id="login-pass" type="password" placeholder="••••••••" class="fl-input fl-input-icon-right">
+                <button onclick="togglePassword('login-pass',this)" class="btn-eye"><i data-lucide="eye" style="width:20px;height:20px;"></i></button>
             </div>
+        </div>
+        <div style="text-align:right;margin-bottom:22px;">
+            <button onclick="resetearPassword(document.getElementById('login-email').value)" class="btn-link">¿Olvidaste tu contraseña?</button>
+        </div>
+        <button id="btn-login" onclick="iniciarSesion(document.getElementById('login-email').value,document.getElementById('login-pass').value)" class="btn-primary" style="margin-bottom:12px;">
+            <i data-lucide="key-round" style="width:20px;height:20px;"></i> INGRESAR
+        </button>
+        <button onclick="accesoInvitado()" class="btn-ghost" style="margin-bottom:20px;">
+            <i data-lucide="eye" style="width:18px;height:18px;"></i> EXPLORAR COMO INVITADO · 24H
+        </button>
+        <p style="text-align:center;font-family:'Barlow',sans-serif;font-size:15px;color:var(--muted);margin-bottom:16px;">
+            ¿No tenés cuenta? <button onclick="switchAuthTab('registro')" class="btn-link">Creá una gratis</button>
+        </p>
+        <div style="text-align:center;border-top:1px solid var(--border);padding-top:16px;">
+            <button onclick="alert('Contacta a tu entrenador para acceder')" class="btn-link" style="display:inline-flex;align-items:center;gap:6px;">
+                <i data-lucide="graduation-cap" style="width:17px;height:17px;"></i> Soy profesor registrado
+            </button>
+        </div>
+    </div>
 
-            <div style="margin-bottom: 14px;">
-                <div class="input-label">Correo Electrónico</div>
-                <div class="input-wrapper">
-                    <i data-lucide="mail" class="input-icon"></i>
-                    <input id="reg-email" type="email" placeholder="tu@email.com" class="fl-input">
-                </div>
+    <!-- FORM REGISTRO -->
+    <div id="form-registro" style="width:100%;max-width:380px;display:none;">
+        <div style="margin-bottom:14px;">
+            <div class="input-label">Nombre Completo</div>
+            <div class="input-wrapper">
+                <i data-lucide="user" class="input-icon"></i>
+                <input id="reg-nombre" type="text" placeholder="Tu nombre y apellido" class="fl-input">
             </div>
-
-            <div style="margin-bottom: 14px;">
-                <div class="input-label">Contraseña</div>
-                <div class="input-wrapper">
-                    <i data-lucide="lock" class="input-icon"></i>
-                    <input id="reg-pass" type="password" placeholder="Mínimo 6 caracteres" class="fl-input fl-input-icon-right">
-                    <button onclick="togglePassword('reg-pass', this)" class="btn-eye">
-                        <i data-lucide="eye" style="width:20px;height:20px;"></i>
-                    </button>
-                </div>
+        </div>
+        <div style="margin-bottom:14px;">
+            <div class="input-label">Correo Electrónico</div>
+            <div class="input-wrapper">
+                <i data-lucide="mail" class="input-icon"></i>
+                <input id="reg-email" type="email" placeholder="tu@email.com" class="fl-input">
             </div>
-
-            <div style="margin-bottom: 20px;">
-                <div class="input-label">Confirmar Contraseña</div>
-                <div class="input-wrapper">
-                    <i data-lucide="shield-check" class="input-icon"></i>
-                    <input id="reg-pass-confirm" type="password" placeholder="Repetí tu contraseña" class="fl-input fl-input-icon-right">
-                    <button onclick="togglePassword('reg-pass-confirm', this)" class="btn-eye">
-                        <i data-lucide="eye" style="width:20px;height:20px;"></i>
-                    </button>
-                </div>
+        </div>
+        <div style="margin-bottom:14px;">
+            <div class="input-label">Contraseña</div>
+            <div class="input-wrapper">
+                <i data-lucide="lock" class="input-icon"></i>
+                <input id="reg-pass" type="password" placeholder="Mínimo 6 caracteres" class="fl-input fl-input-icon-right">
+                <button onclick="togglePassword('reg-pass',this)" class="btn-eye"><i data-lucide="eye" style="width:20px;height:20px;"></i></button>
             </div>
+        </div>
+        <div style="margin-bottom:20px;">
+            <div class="input-label">Confirmar Contraseña</div>
+            <div class="input-wrapper">
+                <i data-lucide="shield-check" class="input-icon"></i>
+                <input id="reg-pass-confirm" type="password" placeholder="Repetí tu contraseña" class="fl-input fl-input-icon-right">
+                <button onclick="togglePassword('reg-pass-confirm',this)" class="btn-eye"><i data-lucide="eye" style="width:20px;height:20px;"></i></button>
+            </div>
+        </div>
+        <label style="display:flex;align-items:flex-start;gap:12px;background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:14px;margin-bottom:20px;cursor:pointer;">
+            <input id="chk-terminos" type="checkbox" style="margin-top:4px;accent-color:var(--blue);width:18px;height:18px;flex-shrink:0;">
+            <span style="font-family:'Barlow',sans-serif;font-size:14px;color:var(--muted);line-height:1.5;">
+                Leí y acepto los <a href="#" style="color:var(--blue);font-weight:700;">Términos y Condiciones</a> y la
+                <a href="#" style="color:var(--blue);font-weight:700;">Política de Privacidad</a>.
+            </span>
+        </label>
+        <button onclick="validarYRegistrar()" class="btn-primary" style="margin-bottom:16px;">
+            <i data-lucide="user-plus" style="width:20px;height:20px;"></i> CREAR CUENTA GRATIS
+        </button>
+        <p style="text-align:center;font-family:'Barlow',sans-serif;font-size:15px;color:var(--muted);">
+            ¿Ya tenés cuenta? <button onclick="switchAuthTab('login')" class="btn-link">Iniciá sesión</button>
+        </p>
+    </div>
+</div>
 
-            <label style="display: flex; align-items: flex-start; gap: 12px; background: var(--bg2); border: 1px solid var(--border); border-radius: 12px; padding: 14px; margin-bottom: 20px; cursor: pointer;">
-                <input id="chk-terminos" type="checkbox" style="margin-top: 4px; accent-color: var(--blue); width: 18px; height: 18px; flex-shrink: 0;">
-                <span style="font-family: 'Barlow', sans-serif; font-size: 14px; color: var(--muted); line-height: 1.5;">
-                    Leí y acepto los <a href="#" style="color: var(--blue); font-weight: 700;">Términos y Condiciones</a> y la
-                    <a href="#" style="color: var(--blue); font-weight: 700;">Política de Privacidad</a>.
-                    Entiendo que mis datos serán almacenados de forma segura.
+<!-- ========== APP PRINCIPAL ========== -->
+<div id="app" style="display:none;">
+
+    <!-- OVERLAY DRAWER -->
+    <div id="drawer-overlay" onclick="toggleDrawer()" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.6);z-index:1999;backdrop-filter:blur(2px);"></div>
+
+    <!-- DRAWER LATERAL -->
+    <div id="drawer-nav" style="position:fixed;top:0;left:-320px;width:300px;height:100%;background:var(--bg2);z-index:2000;transition:left 0.3s ease;border-right:1px solid var(--border);display:flex;flex-direction:column;overflow-y:auto;">
+
+        <!-- Header drawer -->
+        <div style="display:flex;align-items:center;justify-content:space-between;padding:20px 16px;border-bottom:1px solid var(--border);">
+            <div style="display:flex;align-items:center;gap:10px;">
+                <img src="./assets/logo.webp" style="width:32px;height:32px;border-radius:50%;">
+                <span style="font-family:'Barlow',sans-serif;font-size:18px;font-weight:900;letter-spacing:1px;">
+                    <span style="color:var(--text);">FIT</span><span style="color:var(--blue);">LADDER</span>
                 </span>
-            </label>
-
-            <button onclick="validarYRegistrar()" class="btn-primary" style="margin-bottom: 16px;">
-                <i data-lucide="user-plus" style="width:20px;height:20px;"></i>
-                CREAR CUENTA GRATIS
+            </div>
+            <button onclick="toggleDrawer()" style="background:none;border:none;color:var(--muted);cursor:pointer;">
+                <i data-lucide="x" style="width:22px;height:22px;"></i>
             </button>
-
-            <p style="text-align: center; font-family: 'Barlow', sans-serif; font-size: 15px; color: var(--muted);">
-                ¿Ya tenés cuenta?
-                <button onclick="switchAuthTab('login')" class="btn-link">Iniciá sesión</button>
-            </p>
         </div>
 
+        <!-- Menú items -->
+        <div style="padding:16px 12px;flex:1;">
+
+            <div class="drawer-group-label">ENTRENAMIENTO</div>
+            <div class="drawer-item active" onclick="switchTab('tab-resultados');toggleDrawer();">
+                <i data-lucide="trophy" style="width:20px;height:20px;"></i><span>Resultados</span>
+            </div>
+            <div class="drawer-item" onclick="switchTab('tab-benchmarks');toggleDrawer();">
+                <i data-lucide="link" style="width:20px;height:20px;"></i><span>Benchmarks & WODs</span>
+            </div>
+            <div class="drawer-item" onclick="switchTab('tab-graficos');toggleDrawer();">
+                <i data-lucide="activity" style="width:20px;height:20px;"></i><span>Gráficos</span>
+            </div>
+            <div class="drawer-item" onclick="switchTab('tab-rm');toggleDrawer();">
+                <i data-lucide="bar-chart-2" style="width:20px;height:20px;"></i><span>Calculadora RM</span>
+            </div>
+            <div class="drawer-item" onclick="switchTab('tab-competencias');toggleDrawer();">
+                <i data-lucide="award" style="width:20px;height:20px;"></i><span>Competencias</span>
+            </div>
+            <div class="drawer-item" onclick="switchTab('tab-estiramientos');toggleDrawer();">
+                <i data-lucide="wind" style="width:20px;height:20px;"></i><span>Estiramientos</span>
+            </div>
+
+            <div class="drawer-group-label" style="margin-top:16px;">CUERPO</div>
+            <div class="drawer-item" onclick="switchTab('tab-cuerpo');toggleDrawer();">
+                <i data-lucide="clipboard-list" style="width:20px;height:20px;"></i><span>Peso corporal</span>
+            </div>
+            <div class="drawer-item" onclick="switchTab('tab-antropometria');toggleDrawer();">
+                <i data-lucide="arrow-left-right" style="width:20px;height:20px;"></i><span>Antropométricos</span>
+            </div>
+            <div class="drawer-item" onclick="switchTab('tab-menstrual');toggleDrawer();">
+                <i data-lucide="clock" style="width:20px;height:20px;"></i><span>C. Menstrual</span>
+            </div>
+
+            <div class="drawer-group-label" style="margin-top:16px;">NUTRICIÓN</div>
+            <div class="drawer-item" onclick="switchTab('tab-nutricion');toggleDrawer();">
+                <i data-lucide="map-pin" style="width:20px;height:20px;"></i><span>Calorías</span>
+            </div>
+
+            <div class="drawer-group-label" style="margin-top:16px;">COMUNIDAD</div>
+            <div class="drawer-item" onclick="switchTab('tab-comunidad');toggleDrawer();">
+                <i data-lucide="message-square" style="width:20px;height:20px;"></i><span>Feed</span>
+            </div>
+            <div class="drawer-item" onclick="switchTab('tab-profesores');toggleDrawer();">
+                <i data-lucide="users" style="width:20px;height:20px;"></i><span>Profesores</span>
+            </div>
+
+            <div class="drawer-group-label" style="margin-top:16px;">INFO</div>
+            <div class="drawer-item" onclick="switchTab('tab-legal');toggleDrawer();">
+                <i data-lucide="file-text" style="width:20px;height:20px;"></i><span>Términos y privacidad</span>
+            </div>
+        </div>
+
+        <!-- Footer drawer: perfil usuario -->
+        <div style="padding:16px;border-top:1px solid var(--border);display:flex;align-items:center;gap:12px;">
+            <div style="width:40px;height:40px;background:var(--blue);border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:'Barlow',sans-serif;font-weight:900;font-size:16px;" id="drawer-avatar">?</div>
+            <div>
+                <div id="drawer-nombre" style="font-family:'Barlow',sans-serif;font-weight:700;font-size:15px;">Cargando...</div>
+                <div id="drawer-email" style="font-family:'Barlow',sans-serif;font-size:13px;color:var(--muted);">—</div>
+            </div>
+        </div>
     </div>
 
-    <!-- APP PRINCIPAL -->
-    <div id="app" style="display: none;">
-        <!-- Dashboard y módulos irán aquí -->
+    <!-- TOP BAR -->
+    <div style="position:fixed;top:0;left:0;right:0;height:56px;background:var(--bg2);border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;padding:0 16px;z-index:999;">
+        <button onclick="toggleDrawer()" style="background:none;border:none;color:var(--text);cursor:pointer;display:flex;align-items:center;">
+            <i data-lucide="menu" style="width:24px;height:24px;"></i>
+        </button>
+        <span style="font-family:'Barlow',sans-serif;font-weight:900;font-size:17px;letter-spacing:1px;">
+            <span style="color:var(--text);">FIT</span><span style="color:var(--blue);">LADDER</span>
+        </span>
+        <button onclick="switchTab('tab-perfil')" style="background:none;border:none;cursor:pointer;">
+            <div style="width:34px;height:34px;background:var(--blue);border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:'Barlow',sans-serif;font-weight:900;font-size:14px;" id="topbar-avatar">?</div>
+        </button>
     </div>
 
-    <script src="./js/firebase-config.js"></script>
-    <script src="./js/ui-logic.js"></script>
-    <script src="./js/auth.js"></script>
-    <script src="./js/main.js"></script>
+    <!-- ===== MÓDULOS ===== -->
 
-    <script>
-        lucide.createIcons();
+    <!-- DASHBOARD -->
+    <section id="tab-dashboard" class="tab-content active">
+        <h2 style="font-family:var(--fd);font-size:28px;margin-bottom:6px;">BIENVENIDO</h2>
+        <p style="color:var(--muted);font-size:15px;margin-bottom:24px;">Selecciona un módulo desde el menú</p>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+            <div class="dash-card" onclick="switchTab('tab-resultados')">
+                <i data-lucide="trophy" style="width:28px;height:28px;color:var(--blue);"></i>
+                <span>Resultados</span>
+            </div>
+            <div class="dash-card" onclick="switchTab('tab-rm')">
+                <i data-lucide="bar-chart-2" style="width:28px;height:28px;color:var(--blue);"></i>
+                <span>Calculadora RM</span>
+            </div>
+            <div class="dash-card" onclick="switchTab('tab-cuerpo')">
+                <i data-lucide="clipboard-list" style="width:28px;height:28px;color:var(--blue);"></i>
+                <span>Peso Corporal</span>
+            </div>
+            <div class="dash-card" onclick="switchTab('tab-nutricion')">
+                <i data-lucide="map-pin" style="width:28px;height:28px;color:var(--blue);"></i>
+                <span>Calorías</span>
+            </div>
+            <div class="dash-card" onclick="switchTab('tab-competencias')">
+                <i data-lucide="award" style="width:28px;height:28px;color:var(--blue);"></i>
+                <span>Competencias</span>
+            </div>
+            <div class="dash-card" onclick="switchTab('tab-comunidad')">
+                <i data-lucide="message-square" style="width:28px;height:28px;color:var(--blue);"></i>
+                <span>Feed</span>
+            </div>
+        </div>
+    </section>
 
-        function switchAuthTab(tab) {
-            const formLogin    = document.getElementById('form-login');
-            const formRegistro = document.getElementById('form-registro');
-            const tabLogin     = document.getElementById('tab-login');
-            const tabRegistro  = document.getElementById('tab-registro');
+    <!-- RESULTADOS -->
+    <section id="tab-resultados" class="tab-content">
+        <div class="card-glass">
+            <h3 style="font-family:var(--fd);font-size:22px;margin-bottom:16px;">HISTORIAL DE RESULTADOS</h3>
+            <div id="historial-lista"></div>
+        </div>
+    </section>
 
-            const currentForm = tab === 'login' ? formRegistro : formLogin;
-            const nextForm    = tab === 'login' ? formLogin    : formRegistro;
+    <!-- BENCHMARKS -->
+    <section id="tab-benchmarks" class="tab-content">
+        <div class="section-header">
+            <h2 style="font-family:var(--fd);font-size:26px;">BENCHMARKS & WODS</h2>
+        </div>
+        <div id="pr-container" class="grid-2"></div>
+    </section>
 
-            currentForm.style.transition = 'opacity 0.2s ease, transform 0.2s ease';
-            currentForm.style.opacity    = '0';
-            currentForm.style.transform  = tab === 'login' ? 'translateX(30px)' : 'translateX(-30px)';
+    <!-- GRÁFICOS -->
+    <section id="tab-graficos" class="tab-content">
+        <h2 style="font-family:var(--fd);font-size:26px;margin-bottom:16px;">GRÁFICOS</h2>
+        <div class="card-glass">
+            <p style="color:var(--muted);">Próximamente</p>
+        </div>
+    </section>
 
-            setTimeout(() => {
-                currentForm.style.display = 'none';
-                nextForm.style.display    = 'block';
-                nextForm.style.opacity    = '0';
-                nextForm.style.transform  = tab === 'login' ? 'translateX(-30px)' : 'translateX(30px)';
-                nextForm.offsetHeight;
-                nextForm.style.transition = 'opacity 0.25s ease, transform 0.25s ease';
-                nextForm.style.opacity    = '1';
-                nextForm.style.transform  = 'translateX(0)';
-                lucide.createIcons();
-            }, 200);
+    <!-- CALCULADORA RM -->
+    <section id="tab-rm" class="tab-content">
+        <div class="calculator-card">
+            <h2 style="font-family:var(--fd);font-size:26px;margin-bottom:20px;">CALCULADORA 1RM</h2>
+            <div class="input-label">Peso levantado (kg)</div>
+            <div class="input-wrapper" style="margin-bottom:14px;">
+                <i data-lucide="dumbbell" class="input-icon"></i>
+                <input type="number" id="rm-peso" placeholder="Ej: 80" class="fl-input">
+            </div>
+            <div class="input-label">Repeticiones</div>
+            <div class="input-wrapper" style="margin-bottom:20px;">
+                <i data-lucide="repeat" class="input-icon"></i>
+                <input type="number" id="rm-reps" placeholder="Ej: 5" class="fl-input">
+            </div>
+            <button onclick="calcular1RM()" class="btn-primary">
+                <i data-lucide="calculator" style="width:20px;height:20px;"></i> CALCULAR
+            </button>
+            <div id="rm-resultado" style="margin-top:20px;"></div>
+        </div>
+    </section>
 
-            if (tab === 'login') {
-                tabLogin.style.background    = 'var(--blue)';
-                tabLogin.style.color         = '#fff';
-                tabRegistro.style.background = 'transparent';
-                tabRegistro.style.color      = 'var(--muted)';
-            } else {
-                tabRegistro.style.background = 'var(--blue)';
-                tabRegistro.style.color      = '#fff';
-                tabLogin.style.background    = 'transparent';
-                tabLogin.style.color         = 'var(--muted)';
-            }
-        }
+    <!-- COMPETENCIAS -->
+    <section id="tab-competencias" class="tab-content">
+        <h2 style="font-family:var(--fd);font-size:26px;margin-bottom:16px;">COMPETENCIAS</h2>
+        <div id="competencias-list"></div>
+    </section>
 
-        function togglePassword(inputId, btn) {
-            const input = document.getElementById(inputId);
-            const isPassword = input.type === 'password';
-            input.type = isPassword ? 'text' : 'password';
-            btn.innerHTML = isPassword
-                ? '<i data-lucide="eye-off" style="width:20px;height:20px;"></i>'
-                : '<i data-lucide="eye" style="width:20px;height:20px;"></i>';
+    <!-- ESTIRAMIENTOS -->
+    <section id="tab-estiramientos" class="tab-content">
+        <h2 style="font-family:var(--fd);font-size:26px;margin-bottom:16px;">ESTIRAMIENTOS</h2>
+        <div class="video-grid"></div>
+    </section>
+
+    <!-- CUERPO -->
+    <section id="tab-cuerpo" class="tab-content">
+        <div class="form-card">
+            <h2 style="font-family:var(--fd);font-size:26px;margin-bottom:20px;">SEGUIMIENTO CORPORAL</h2>
+            <div class="input-label">Peso actual</div>
+            <div class="input-wrapper" style="margin-bottom:14px;">
+                <i data-lucide="scale" class="input-icon"></i>
+                <input type="number" id="peso-actual" placeholder="Peso (kg)" class="fl-input">
+            </div>
+            <button onclick="guardarPeso()" class="btn-primary">
+                <i data-lucide="save" style="width:20px;height:20px;"></i> REGISTRAR PESO
+            </button>
+        </div>
+        <div id="medidas-antropometricas" class="grid-2" style="margin-top:16px;"></div>
+    </section>
+
+    <!-- ANTROPOMETRÍA -->
+    <section id="tab-antropometria" class="tab-content">
+        <h2 style="font-family:var(--fd);font-size:26px;margin-bottom:16px;">ANTROPOMÉTRICOS</h2>
+        <div class="card-glass">
+            <p style="color:var(--muted);">Próximamente</p>
+        </div>
+    </section>
+
+    <!-- CICLO MENSTRUAL -->
+    <section id="tab-menstrual" class="tab-content">
+        <h2 style="font-family:var(--fd);font-size:26px;margin-bottom:16px;">CICLO MENSTRUAL</h2>
+        <div class="card-glass">
+            <p style="color:var(--muted);">Próximamente</p>
+        </div>
+    </section>
+
+    <!-- NUTRICIÓN -->
+    <section id="tab-nutricion" class="tab-content">
+        <div class="cal-header">
+            <div class="cal-circle">
+                <span id="cals-restantes" style="font-family:var(--fd);font-size:36px;color:var(--blue);">0</span>
+                <small style="color:var(--muted);font-size:13px;">kcal restantes</small>
+            </div>
+        </div>
+        <div id="comidas-lista" style="margin-top:20px;"></div>
+    </section>
+
+    <!-- COMUNIDAD -->
+    <section id="tab-comunidad" class="tab-content">
+        <h2 style="font-family:var(--fd);font-size:26px;margin-bottom:16px;">FEED</h2>
+        <div id="feed-social"></div>
+    </section>
+
+    <!-- PROFESORES -->
+    <section id="tab-profesores" class="tab-content">
+        <h2 style="font-family:var(--fd);font-size:26px;margin-bottom:16px;">PROFESORES</h2>
+        <div class="profes-list"></div>
+    </section>
+
+    <!-- PERFIL -->
+    <section id="tab-perfil" class="tab-content">
+        <h2 style="font-family:var(--fd);font-size:26px;margin-bottom:20px;">MI PERFIL</h2>
+        <div class="card-glass" style="display:flex;align-items:center;gap:16px;margin-bottom:16px;">
+            <div style="width:56px;height:56px;background:var(--blue);border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:'Barlow',sans-serif;font-weight:900;font-size:22px;" id="perfil-avatar">?</div>
+            <div>
+                <div id="perfil-nombre" style="font-family:'Barlow',sans-serif;font-weight:900;font-size:18px;">—</div>
+                <div id="perfil-email" style="color:var(--muted);font-size:14px;">—</div>
+            </div>
+        </div>
+        <button onclick="cerrarSesion()" class="btn-ghost">
+            <i data-lucide="log-out" style="width:18px;height:18px;"></i> CERRAR SESIÓN
+        </button>
+    </section>
+
+    <!-- LEGAL -->
+    <section id="tab-legal" class="tab-content">
+        <div class="legal-text">
+            <h2 style="font-family:var(--fd);font-size:26px;margin-bottom:16px;">TÉRMINOS Y PRIVACIDAD</h2>
+            <div id="politicas-content" style="color:var(--muted);font-size:15px;line-height:1.7;">
+                <p>Próximamente se publicarán los términos y condiciones completos.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- NAVEGACIÓN INFERIOR -->
+    <nav class="mobile-nav">
+        <div class="nav-item active" onclick="switchTab('tab-dashboard')">
+            <i data-lucide="home"></i><span>Inicio</span>
+        </div>
+        <div class="nav-item" onclick="switchTab('tab-resultados')">
+            <i data-lucide="trophy"></i><span>Resultados</span>
+        </div>
+        <div class="nav-item" onclick="switchTab('tab-rm')">
+            <i data-lucide="bar-chart-2"></i><span>1RM</span>
+        </div>
+        <div class="nav-item" onclick="switchTab('tab-cuerpo')">
+            <i data-lucide="clipboard-list"></i><span>Cuerpo</span>
+        </div>
+        <div class="nav-item" onclick="switchTab('tab-perfil')">
+            <i data-lucide="user"></i><span>Perfil</span>
+        </div>
+    </nav>
+
+</div><!-- fin #app -->
+
+<script src="./js/firebase-config.js"></script>
+<script src="./js/ui-logic.js"></script>
+<script src="./js/auth.js"></script>
+<script src="./js/main.js"></script>
+
+<script>
+    lucide.createIcons();
+
+    function switchAuthTab(tab) {
+        const formLogin    = document.getElementById('form-login');
+        const formRegistro = document.getElementById('form-registro');
+        const tabLogin     = document.getElementById('tab-login');
+        const tabRegistro  = document.getElementById('tab-registro');
+        const currentForm  = tab === 'login' ? formRegistro : formLogin;
+        const nextForm     = tab === 'login' ? formLogin    : formRegistro;
+
+        currentForm.style.transition = 'opacity 0.2s ease, transform 0.2s ease';
+        currentForm.style.opacity    = '0';
+        currentForm.style.transform  = tab === 'login' ? 'translateX(30px)' : 'translateX(-30px)';
+
+        setTimeout(() => {
+            currentForm.style.display = 'none';
+            nextForm.style.display    = 'block';
+            nextForm.style.opacity    = '0';
+            nextForm.style.transform  = tab === 'login' ? 'translateX(-30px)' : 'translateX(30px)';
+            nextForm.offsetHeight;
+            nextForm.style.transition = 'opacity 0.25s ease, transform 0.25s ease';
+            nextForm.style.opacity    = '1';
+            nextForm.style.transform  = 'translateX(0)';
             lucide.createIcons();
+        }, 200);
+
+        if (tab === 'login') {
+            tabLogin.style.background = 'var(--blue)'; tabLogin.style.color = '#fff';
+            tabRegistro.style.background = 'transparent'; tabRegistro.style.color = 'var(--muted)';
+        } else {
+            tabRegistro.style.background = 'var(--blue)'; tabRegistro.style.color = '#fff';
+            tabLogin.style.background = 'transparent'; tabLogin.style.color = 'var(--muted)';
         }
+    }
 
-        function validarYRegistrar() {
-            const nombre      = document.getElementById('reg-nombre').value.trim();
-            const email       = document.getElementById('reg-email').value.trim();
-            const pass        = document.getElementById('reg-pass').value;
-            const passConfirm = document.getElementById('reg-pass-confirm').value;
-            const terminos    = document.getElementById('chk-terminos').checked;
+    function togglePassword(inputId, btn) {
+        const input = document.getElementById(inputId);
+        const isPassword = input.type === 'password';
+        input.type = isPassword ? 'text' : 'password';
+        btn.innerHTML = isPassword
+            ? '<i data-lucide="eye-off" style="width:20px;height:20px;"></i>'
+            : '<i data-lucide="eye" style="width:20px;height:20px;"></i>';
+        lucide.createIcons();
+    }
 
-            if (!nombre || !email || !pass)  return alert("Completá todos los campos.");
-            if (pass !== passConfirm)         return alert("Las contraseñas no coinciden.");
-            if (pass.length < 6)              return alert("La contraseña debe tener al menos 6 caracteres.");
-            if (!terminos)                    return alert("Debés aceptar los Términos y Condiciones.");
+    function validarYRegistrar() {
+        const nombre      = document.getElementById('reg-nombre').value.trim();
+        const email       = document.getElementById('reg-email').value.trim();
+        const pass        = document.getElementById('reg-pass').value;
+        const passConfirm = document.getElementById('reg-pass-confirm').value;
+        const terminos    = document.getElementById('chk-terminos').checked;
+        if (!nombre || !email || !pass)  return alert("Completá todos los campos.");
+        if (pass !== passConfirm)         return alert("Las contraseñas no coinciden.");
+        if (pass.length < 6)              return alert("La contraseña debe tener al menos 6 caracteres.");
+        if (!terminos)                    return alert("Debés aceptar los Términos y Condiciones.");
+        registrarUsuario(email, pass, nombre);
+    }
 
-            registrarUsuario(email, pass, nombre);
-        }
-
-        window.switchAuthTab     = switchAuthTab;
-        window.togglePassword    = togglePassword;
-        window.validarYRegistrar = validarYRegistrar;
-    </script>
+    window.switchAuthTab     = switchAuthTab;
+    window.togglePassword    = togglePassword;
+    window.validarYRegistrar = validarYRegistrar;
+</script>
 </body>
 </html>
