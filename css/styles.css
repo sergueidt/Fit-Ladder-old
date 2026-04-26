@@ -426,3 +426,35 @@ body {
 
 .legal-text { padding: 4px 0; }
 .profes-list { display: flex; flex-direction: column; gap: 12px; }
+
+/* ============================================
+   DRAWER — OVERRIDE COMPLETO
+   ============================================ */
+
+#drawer-nav {
+    position: fixed;
+    top: 0;
+    left: -300px;
+    width: 300px;
+    height: 100%;
+    background: var(--bg2);
+    z-index: 10001;
+    transition: left 0.3s ease;
+    border-right: 1px solid var(--border);
+    display: flex;
+    flex-direction: column;
+    overflow-y: auto;
+}
+
+#drawer-nav.open { left: 0; }
+
+#drawer-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.7);
+    display: none;
+    z-index: 10000;
+    backdrop-filter: blur(2px);
+}
+
+#drawer-overlay.active { display: block; }
