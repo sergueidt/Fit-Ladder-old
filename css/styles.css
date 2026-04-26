@@ -240,3 +240,189 @@ body {
 }
 
 .fade-in { animation: fadeIn 0.3s ease forwards; }
+
+/* ============================================
+   NAVEGACIÓN INFERIOR (Tab Bar)
+   ============================================ */
+
+.mobile-nav {
+  position: fixed;
+  bottom: 0;
+  width: 100%;
+  background: var(--bg2);
+  display: flex;
+  justify-content: space-around;
+  padding: 10px 0 20px; /* 20px extra para safe area en iPhone */
+  border-top: 1px solid var(--border);
+  z-index: 1000;
+}
+
+.nav-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  cursor: pointer;
+  padding: 6px 16px;
+  border-radius: 12px;
+  transition: all 0.2s ease;
+  color: var(--muted);
+}
+
+.nav-item span {
+  font-family: 'Barlow', sans-serif;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+}
+
+.nav-item svg {
+  width: 24px;
+  height: 24px;
+  stroke-width: 1.75;
+  transition: all 0.2s ease;
+}
+
+.nav-item.active {
+  color: var(--blue);
+}
+
+.nav-item.active svg {
+  stroke-width: 2.5;
+}
+
+/* ============================================
+   TABS / CONTENIDO
+   ============================================ */
+
+.tab-content {
+  display: none;
+  padding: 20px 16px 90px; /* 90px para no quedar bajo el nav */
+  min-height: 100vh;
+}
+
+.tab-content.active {
+  display: block;
+}
+
+/* ============================================
+   DRAWER LATERAL
+   ============================================ */
+
+#drawer-nav.open {
+  left: 0;
+}
+
+.drawer-group-label {
+  font-family: 'Barlow', sans-serif;
+  font-size: 11px;
+  font-weight: 900;
+  color: var(--muted);
+  letter-spacing: 2px;
+  padding: 8px 12px 4px;
+  text-transform: uppercase;
+}
+
+.drawer-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 14px;
+  border-radius: 10px;
+  cursor: pointer;
+  font-family: 'Barlow', sans-serif;
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--text);
+  transition: background 0.2s ease;
+  margin-bottom: 2px;
+}
+
+.drawer-item:hover  { background: var(--bg3); }
+.drawer-item.active { background: var(--blue); color: #fff; font-weight: 700; }
+.drawer-item svg    { flex-shrink: 0; stroke-width: 1.75; }
+
+/* ============================================
+   TOP BAR
+   ============================================ */
+
+.tab-content {
+  padding: 76px 16px 100px; /* top: 56px topbar + 20px; bottom: nav */
+  min-height: 100vh;
+}
+
+/* ============================================
+   CARDS
+   ============================================ */
+
+.card-glass {
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 20px;
+  margin-bottom: 16px;
+}
+
+.dash-card {
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 20px 16px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  cursor: pointer;
+  font-family: 'Barlow', sans-serif;
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--text);
+  text-align: center;
+  transition: background 0.2s ease, transform 0.15s ease;
+}
+
+.dash-card:hover  { background: var(--bg3); transform: scale(1.02); }
+
+.calculator-card,
+.form-card {
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 24px 20px;
+}
+
+.grid-2 {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+.section-header { margin-bottom: 16px; }
+
+.cal-header {
+  display: flex;
+  justify-content: center;
+  padding: 20px 0;
+}
+
+.cal-circle {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 140px;
+  height: 140px;
+  border-radius: 50%;
+  border: 3px solid var(--blue);
+  background: var(--bg2);
+}
+
+.video-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+.legal-text { padding: 4px 0; }
+.profes-list { display: flex; flex-direction: column; gap: 12px; }
