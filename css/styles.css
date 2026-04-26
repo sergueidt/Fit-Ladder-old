@@ -10,6 +10,7 @@
   --text:   #e8edf8;
   --muted:  #6b7a99;
   --border: #1e2d4a;
+  --fs:     22px;         /* ← tamaño base global */
   --fd:     'Bebas Neue', sans-serif;
   --fb:     'Barlow', sans-serif;
 }
