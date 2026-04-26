@@ -6,8 +6,22 @@
 function toggleDrawer() {
     const drawer  = document.getElementById('drawer-nav');
     const overlay = document.getElementById('drawer-overlay');
-    if (drawer)  drawer.classList.toggle('open');
-    if (overlay) overlay.classList.toggle('active');
+    const isOpen  = drawer.classList.contains('open');
+
+    if (isOpen) {
+        drawer.classList.remove('open');
+        overlay.classList.remove('active');
+    } else {
+        drawer.classList.add('open');
+        overlay.classList.add('active');
+    }
+}
+
+function cerrarDrawer() {
+    const drawer  = document.getElementById('drawer-nav');
+    const overlay = document.getElementById('drawer-overlay');
+    if (drawer)  drawer.classList.remove('open');
+    if (overlay) overlay.classList.remove('active');
 }
 
 // --- CAMBIO DE SECCIONES ---
