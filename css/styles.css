@@ -18,11 +18,19 @@
 * { box-sizing: border-box; margin: 0; padding: 0; }
 
 body {
-  font-family: var(--fb);
-  background: var(--bg);
-  color: var(--text);
-  min-height: 100vh;
-  font-size: var(--fs);
+  background-image: url('./assets/hero-bg.webp');
+  background-size: cover;
+  background-position: center top;
+  background-repeat: no-repeat;
+  background-attachment: fixed;
+}
+
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background: rgba(8, 12, 20, 0.88);
+  z-index: -1;
 }
 
 /* ============================================
