@@ -1,12 +1,13 @@
 // Reemplaza estos valores con tus credenciales de Firebase
 const firebaseConfig = {
-  apiKey: "TU_API_KEY",
-  authDomain: "fit-ladder.firebaseapp.com",
-  projectId: "fit-ladder",
-  storageBucket: "fit-ladder.appspot.com",
-  messagingSenderId: "TU_SENDER_ID",
-  appId: "TU_APP_ID"
-};
+  apiKey: "AIzaSyBeLq0vGbUjbJX5rDl78hQ-dvaNCB0h3q0",
+  authDomain: "fit-ladder-py.firebaseapp.com",
+  databaseURL: "https://fit-ladder-py-default-rtdb.firebaseio.com",
+  projectId: "fit-ladder-py",
+  storageBucket: "fit-ladder-py.firebasestorage.app",
+  messagingSenderId: "1089939861001",
+  appId: "1:1089939861001:web:35b669d3cdc03bf090d2d8"
+}
 
 // Inicializar Firebase
 firebase.initializeApp(firebaseConfig);
