@@ -12,8 +12,6 @@
     <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-<script src="https://unpkg.com/lucide@latest"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
 </head>
 <body>
@@ -127,7 +125,8 @@
     <div id="drawer-overlay" onclick="toggleDrawer()" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.6);z-index:1999;backdrop-filter:blur(2px);"></div>
 
     <!-- DRAWER LATERAL -->
-    <div id="drawer-nav">
+    <div id="drawer-nav" style="position:fixed;top:0;left:-320px;width:300px;height:100%;background:var(--bg2);z-index:2000;transition:left 0.3s ease;border-right:1px solid var(--border);display:flex;flex-direction:column;overflow-y:auto;">
+
         <!-- Header drawer -->
         <div style="display:flex;align-items:center;justify-content:space-between;padding:20px 16px;border-bottom:1px solid var(--border);">
             <div style="display:flex;align-items:center;gap:10px;">
@@ -145,51 +144,51 @@
         <div style="padding:16px 12px;flex:1;">
 
             <div class="drawer-group-label">ENTRENAMIENTO</div>
-            <div class="drawer-item active" onclick="switchTab('tab-resultados');toggleDrawer();">
+            <div class="drawer-item active" onclick="switchTab('tab-resultados')">
                 <i data-lucide="trophy" style="width:20px;height:20px;"></i><span>Resultados</span>
             </div>
-            <div class="drawer-item" onclick="switchTab('tab-benchmarks');toggleDrawer();">
+            <div class="drawer-item" onclick="switchTab('tab-benchmarks')">
                 <i data-lucide="link" style="width:20px;height:20px;"></i><span>Benchmarks & WODs</span>
             </div>
-            <div class="drawer-item" onclick="switchTab('tab-graficos');toggleDrawer();">
+            <div class="drawer-item" onclick="switchTab('tab-graficos')">
                 <i data-lucide="activity" style="width:20px;height:20px;"></i><span>Gráficos</span>
             </div>
-            <div class="drawer-item" onclick="switchTab('tab-rm');toggleDrawer();">
+            <div class="drawer-item" onclick="switchTab('tab-rm')">
                 <i data-lucide="bar-chart-2" style="width:20px;height:20px;"></i><span>Calculadora RM</span>
             </div>
-            <div class="drawer-item" onclick="switchTab('tab-competencias');toggleDrawer();">
+            <div class="drawer-item" onclick="switchTab('tab-competencias')">
                 <i data-lucide="award" style="width:20px;height:20px;"></i><span>Competencias</span>
             </div>
-            <div class="drawer-item" onclick="switchTab('tab-estiramientos');toggleDrawer();">
+            <div class="drawer-item" onclick="switchTab('tab-estiramientos')">
                 <i data-lucide="wind" style="width:20px;height:20px;"></i><span>Estiramientos</span>
             </div>
 
             <div class="drawer-group-label" style="margin-top:16px;">CUERPO</div>
-            <div class="drawer-item" onclick="switchTab('tab-cuerpo');toggleDrawer();">
+            <div class="drawer-item" onclick="switchTab('tab-cuerpo')">
                 <i data-lucide="clipboard-list" style="width:20px;height:20px;"></i><span>Peso corporal</span>
             </div>
-            <div class="drawer-item" onclick="switchTab('tab-antropometria');toggleDrawer();">
+            <div class="drawer-item" onclick="switchTab('tab-antropometria')">
                 <i data-lucide="arrow-left-right" style="width:20px;height:20px;"></i><span>Antropométricos</span>
             </div>
-            <div class="drawer-item" onclick="switchTab('tab-menstrual');toggleDrawer();">
+            <div class="drawer-item" onclick="switchTab('tab-menstrual')">
                 <i data-lucide="clock" style="width:20px;height:20px;"></i><span>C. Menstrual</span>
             </div>
 
             <div class="drawer-group-label" style="margin-top:16px;">NUTRICIÓN</div>
-            <div class="drawer-item" onclick="switchTab('tab-nutricion');toggleDrawer();">
+            <div class="drawer-item" onclick="switchTab('tab-nutricion')">
                 <i data-lucide="map-pin" style="width:20px;height:20px;"></i><span>Calorías</span>
             </div>
 
             <div class="drawer-group-label" style="margin-top:16px;">COMUNIDAD</div>
-            <div class="drawer-item" onclick="switchTab('tab-comunidad');toggleDrawer();">
+            <div class="drawer-item" onclick="switchTab('tab-comunidad')">
                 <i data-lucide="message-square" style="width:20px;height:20px;"></i><span>Feed</span>
             </div>
-            <div class="drawer-item" onclick="switchTab('tab-profesores');toggleDrawer();">
+            <div class="drawer-item" onclick="switchTab('tab-profesores')">
                 <i data-lucide="users" style="width:20px;height:20px;"></i><span>Profesores</span>
             </div>
 
             <div class="drawer-group-label" style="margin-top:16px;">INFO</div>
-            <div class="drawer-item" onclick="switchTab('tab-legal');toggleDrawer();">
+            <div class="drawer-item" onclick="switchTab('tab-legal')">
                 <i data-lucide="file-text" style="width:20px;height:20px;"></i><span>Términos y privacidad</span>
             </div>
         </div>
