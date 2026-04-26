@@ -14,11 +14,7 @@
   --fb:     'Barlow', sans-serif;
 }
 
-* {
-  box-sizing: border-box;
-  margin: 0;
-  padding: 0;
-}
+* { box-sizing: border-box; margin: 0; padding: 0; }
 
 body {
   font-family: var(--fb);
@@ -27,19 +23,161 @@ body {
   min-height: 100vh;
 }
 
-/* --- BOTONES --- */
-.btn-blue {
+/* ============================================
+   SISTEMA DE ICONOS (Lucide) — GLOBAL
+   Usar en toda la app, nunca emojis
+   ============================================ */
+
+/* Icono dentro de input */
+.input-wrapper {
+  position: relative;
+}
+
+.input-icon {
+  position: absolute;
+  left: 14px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 18px;
+  height: 18px;
+  color: var(--muted);
+  opacity: 0.5;
+  pointer-events: none;
+}
+
+/* Icono en botones — alineación */
+.btn-icon {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* Icono de acción con fondo (estilo GOWOD) */
+.icon-box {
+  width: 52px;
+  height: 52px;
+  background: var(--bg3);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text);
+}
+
+.icon-box svg {
+  width: 24px;
+  height: 24px;
+  stroke-width: 1.75;
+}
+
+/* ============================================
+   INPUTS
+   ============================================ */
+
+.input-label {
+  font-family: 'Barlow', sans-serif;
+  font-size: 11px;
+  font-weight: 900;
+  color: var(--muted);
+  margin-bottom: 8px;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+}
+
+.fl-input {
+  width: 100%;
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  color: var(--text);
+  font-family: 'Barlow', sans-serif;
+  font-size: 15px;
+  padding: 14px 14px 14px 42px;
+  outline: none;
+  transition: border-color 0.3s ease;
+  box-sizing: border-box;
+}
+
+.fl-input:focus {
+  border-color: var(--blue);
+}
+
+.fl-input-icon-right {
+  padding-right: 42px;
+}
+
+/* ============================================
+   BOTONES
+   ============================================ */
+
+.btn-primary {
+  width: 100%;
   background: var(--blue);
   color: #fff;
   border: none;
-  font-family: var(--fb);
-  font-size: 1rem;
-  font-weight: 700;
-  letter-spacing: 1px;
+  border-radius: 12px;
+  font-family: 'Barlow', sans-serif;
+  font-size: 15px;
+  font-weight: 900;
+  padding: 16px;
   cursor: pointer;
-  transition: opacity 0.2s;
+  letter-spacing: 1px;
+  box-shadow: 0 10px 20px rgba(37, 99, 235, 0.25);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  transition: opacity 0.2s ease;
 }
-.btn-blue:hover { opacity: 0.85; }
+
+.btn-primary:hover { opacity: 0.88; }
+.btn-primary:disabled { opacity: 0.5; cursor: not-allowed; }
+
+.btn-ghost {
+  width: 100%;
+  background: rgba(255, 255, 255, 0.04);
+  color: var(--muted);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  font-family: 'Barlow', sans-serif;
+  font-size: 13px;
+  font-weight: 700;
+  padding: 14px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  transition: background 0.2s ease;
+}
+
+.btn-ghost:hover { background: rgba(255, 255, 255, 0.07); }
+
+.btn-link {
+  background: none;
+  border: none;
+  color: var(--blue);
+  font-family: 'Barlow', sans-serif;
+  font-weight: 900;
+  font-size: 13px;
+  cursor: pointer;
+  padding: 0;
+}
+
+.btn-eye {
+  position: absolute;
+  right: 14px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  color: var(--muted);
+  cursor: pointer;
+  padding: 0;
+  display: flex;
+  align-items: center;
+}
 
 .btn-secondary {
   background: var(--bg3);
@@ -52,29 +190,21 @@ body {
   border-radius: 12px;
   padding: 0.8rem;
   transition: background 0.2s;
+  display: flex;
+  align-items: center;
+  gap: 8px;
 }
+
 .btn-secondary:hover { background: var(--bg2); }
 
-/* --- INPUTS --- */
-.input-style {
-  display: block;
-  background: var(--bg3);
-  border: 1px solid var(--border);
-  padding: 0.8rem 1rem;
-  border-radius: 10px;
-  color: var(--text);
-  font-family: var(--fb);
-  font-size: 1rem;
-  outline: none;
-  transition: border-color 0.2s;
-}
-.input-style:focus { border-color: var(--blue); }
+/* ============================================
+   MODALES
+   ============================================ */
 
-/* --- MODALES --- */
 .modal-overlay {
   position: fixed;
   inset: 0;
-  background: rgba(0,0,0,0.7);
+  background: rgba(0, 0, 0, 0.7);
   z-index: 10000;
   display: flex;
   align-items: center;
@@ -91,14 +221,10 @@ body {
   width: 100%;
 }
 
-/* --- ANIMACIONES --- */
-@keyframes fadeIn {
-  from { opacity: 0; transform: translateY(10px); }
-  to   { opacity: 1; transform: translateY(0); }
-}
-.fade-in { animation: fadeIn 0.3s ease forwards; }
+/* ============================================
+   HERO BACKGROUND (Login)
+   ============================================ */
 
-/* --- HERO BACKGROUND --- */
 #login-screen {
   background-image: url('../assets/hero-bg.webp');
   background-size: cover;
@@ -110,7 +236,7 @@ body {
   content: '';
   position: absolute;
   inset: 0;
-  background: rgba(8, 12, 20, 0.65);
+  background: rgba(8, 12, 20, 0.72);
   z-index: 0;
 }
 
@@ -118,3 +244,14 @@ body {
   position: relative;
   z-index: 1;
 }
+
+/* ============================================
+   ANIMACIONES
+   ============================================ */
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.fade-in { animation: fadeIn 0.3s ease forwards; }
