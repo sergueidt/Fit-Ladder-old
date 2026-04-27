@@ -18,6 +18,10 @@
 * { box-sizing: border-box; margin: 0; padding: 0; }
 
 body {
+  font-family: var(--fb);
+  color: var(--text);
+  min-height: 100vh;
+  font-size: var(--fs);
   background-image: url('./assets/hero-bg.webp');
   background-size: cover;
   background-position: center top;
@@ -215,21 +219,14 @@ body::before {
 }
 
 /* ============================================
-   HERO BACKGROUND (Login)
+   LOGIN SCREEN
    ============================================ */
-
-#login-screen {
-  background-image: url('../assets/hero-bg.webp');
-  background-size: cover;
-  background-position: center top;
-  background-repeat: no-repeat;
-}
 
 #login-screen::before {
   content: '';
   position: absolute;
   inset: 0;
-  background: rgba(8, 12, 20, 0.72);
+  background: rgba(8, 12, 20, 0.65);
   z-index: 0;
 }
 
@@ -257,12 +254,13 @@ body::before {
   position: fixed;
   bottom: 0;
   width: 100%;
-  background: var(--bg2);
+  background: rgba(13, 18, 33, 0.95);
   display: flex;
   justify-content: space-around;
-  padding: 10px 0 20px; /* 20px extra para safe area en iPhone */
+  padding: 10px 0 20px;
   border-top: 1px solid var(--border);
   z-index: 1000;
+  backdrop-filter: blur(10px);
 }
 
 .nav-item {
@@ -292,13 +290,8 @@ body::before {
   transition: all 0.2s ease;
 }
 
-.nav-item.active {
-  color: var(--blue);
-}
-
-.nav-item.active svg {
-  stroke-width: 2.5;
-}
+.nav-item.active       { color: var(--blue); }
+.nav-item.active svg   { stroke-width: 2.5; }
 
 /* ============================================
    TABS / CONTENIDO
@@ -306,21 +299,44 @@ body::before {
 
 .tab-content {
   display: none;
-  padding: 20px 16px 90px; /* 90px para no quedar bajo el nav */
+  padding: 76px 16px 100px;
   min-height: 100vh;
 }
 
-.tab-content.active {
-  display: block;
-}
+.tab-content.active { display: block; }
 
 /* ============================================
    DRAWER LATERAL
    ============================================ */
 
-#drawer-nav.open {
-  left: 0;
+#drawer-nav {
+  position: fixed;
+  top: 0;
+  left: -300px;
+  width: 300px;
+  height: 100%;
+  background: rgba(13, 18, 33, 0.97);
+  z-index: 10001;
+  transition: left 0.3s ease;
+  border-right: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+  backdrop-filter: blur(10px);
 }
+
+#drawer-nav.open { left: 0; }
+
+#drawer-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.6);
+  display: none;
+  z-index: 10000;
+  backdrop-filter: blur(2px);
+}
+
+#drawer-overlay.active { display: block; }
 
 .drawer-group-label {
   font-family: 'Barlow', sans-serif;
@@ -355,9 +371,10 @@ body::before {
    TOP BAR
    ============================================ */
 
-.tab-content {
-  padding: 76px 16px 100px; /* top: 56px topbar + 20px; bottom: nav */
-  min-height: 100vh;
+#topbar {
+  background: rgba(13, 18, 33, 0.95);
+  backdrop-filter: blur(10px);
+  border-bottom: 1px solid var(--border);
 }
 
 /* ============================================
@@ -365,15 +382,16 @@ body::before {
    ============================================ */
 
 .card-glass {
-  background: var(--bg2);
+  background: rgba(13, 18, 33, 0.85);
   border: 1px solid var(--border);
   border-radius: 16px;
   padding: 20px;
   margin-bottom: 16px;
+  backdrop-filter: blur(8px);
 }
 
 .dash-card {
-  background: var(--bg2);
+  background: rgba(13, 18, 33, 0.85);
   border: 1px solid var(--border);
   border-radius: 16px;
   padding: 20px 16px;
@@ -388,16 +406,18 @@ body::before {
   color: var(--text);
   text-align: center;
   transition: background 0.2s ease, transform 0.15s ease;
+  backdrop-filter: blur(8px);
 }
 
-.dash-card:hover  { background: var(--bg3); transform: scale(1.02); }
+.dash-card:hover { background: var(--bg3); transform: scale(1.02); }
 
 .calculator-card,
 .form-card {
-  background: var(--bg2);
+  background: rgba(13, 18, 33, 0.85);
   border: 1px solid var(--border);
   border-radius: 16px;
   padding: 24px 20px;
+  backdrop-filter: blur(8px);
 }
 
 .grid-2 {
@@ -423,7 +443,7 @@ body::before {
   height: 140px;
   border-radius: 50%;
   border: 3px solid var(--blue);
-  background: var(--bg2);
+  background: rgba(13, 18, 33, 0.85);
 }
 
 .video-grid {
@@ -432,37 +452,5 @@ body::before {
   gap: 12px;
 }
 
-.legal-text { padding: 4px 0; }
+.legal-text  { padding: 4px 0; }
 .profes-list { display: flex; flex-direction: column; gap: 12px; }
-
-/* ============================================
-   DRAWER — OVERRIDE COMPLETO
-   ============================================ */
-
-#drawer-nav {
-    position: fixed;
-    top: 0;
-    left: -300px;
-    width: 300px;
-    height: 100%;
-    background: var(--bg2);
-    z-index: 10001;
-    transition: left 0.3s ease;
-    border-right: 1px solid var(--border);
-    display: flex;
-    flex-direction: column;
-    overflow-y: auto;
-}
-
-#drawer-nav.open { left: 0; }
-
-#drawer-overlay {
-    position: fixed;
-    inset: 0;
-    background: rgba(0, 0, 0, 0.7);
-    display: none;
-    z-index: 10000;
-    backdrop-filter: blur(2px);
-}
-
-#drawer-overlay.active { display: block; }
